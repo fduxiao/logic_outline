@@ -1,0 +1,95 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linktoc=all,
+    linkcolor=black,
+}
+
+\renewcommand{\partname}{Part}
+\renewcommand{\chaptername}{Chapter}
+
+\begin{document}
+
+\title{An Outline of Logic}
+\author{Xiao}
+\date{}
+\maketitle
+
+\tableofcontents
+
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction} 
+
+Several years ago, when I was programming, I was fascinated
+by the concept of meta-programming, i.e., generating code with code
+so that I could write less code. Generally, you write some code for
+a real problem. Even if your target is to generate code, you have
+to execute the code to get the result. This sounds nonsense to a 
+mathematician, but this is actually how we handle mathematical 
+logic, i.e., we define our language as mathematical objects 
+(We define the well formed formula or proof as sets) 
+just as we define a group with set theory. When we want to prove
+something, we follow the syntax predefined (e.g. a deduction system).
+
+one of my friends introduced Haskell to me.
+I was excited by this appearently unconventional
+
+In this outline, The first several chapters focus on a
+formal language, namely the type theory and other 
+
+\chapter{Type Theory}
+\chapter{Intuitionistic Logic}
+\chapter{Monad and Algebra}
+\chapter{Combinatory Logic}
+\chapter{Other Useful Examples}
+
+\chapter{Homotopy Interpretation}
+
+\chapter{aaa}
+\section{Structure}
+This section's content...
+
+\subsection{Top Matter}
+This subsection's content...
+
+\subsubsection{Article Information}
+This subsubsection's content...
+
+For more infomation, read \cite[p.~215]{template}\cite{template}
+
+\begin{equation}
+    x = a_0 + \cfrac{1}{a_1 
+            + \cfrac{1}{a_2 
+            + \cfrac{1}{a_3 + \cfrac{1}{a_4} } } }
+  \end{equation}
+
+
+\begin{thebibliography}{}
+
+\bibitem{Haskell}
+    Haskell: \url{https://www.haskell.org}, 
+    a functional programming language.
+
+\bibitem{HoTT}
+    The book,
+    \textit{Homotopy Type Theory, Univalent Foundations of Mathematics},
+    The Univalent Foundations Program, 
+    Institute for Advanced Study,
+    some edition,
+    2020.
+
+
+\bibitem{template}
+    Author Somebody,
+    \textit{\LaTeX: a document preparation system},
+    publisher,
+    some edition,
+    2020.
+
+\end{thebibliography}
+
+\end{document}
