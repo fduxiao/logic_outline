@@ -9,8 +9,10 @@
     linkcolor=blue,
 }
 
-\renewcommand{\partname}{Part}
-\renewcommand{\chaptername}{Chapter}
+\usepackage[english]{babel}
+\addto\extrasenglish{%
+  \def\chapterautorefname{Chapter}%
+}
 
 \begin{document}
 
@@ -54,7 +56,7 @@ that defining inference rule and applying it to another inference is
 widely and naturally accepted in programming. For example, you may have
 proven that to prove $\phi$ or $\psi$, you only need to prove $\psi$ 
 assuming $\phi$ is wrong. I used this in the proof of 
-{\it The boundary of a union is countained in the union of boundaries} 
+{\it The boundary of a union is contained in the union of boundaries} 
 ($\partial(A\cup B)\subseteq \partial A \cup\partial B$). 
 When proving that proposition in {\it Topology Theory}, I can never 
 write a sentence like $\forall A,B\in Props,\phi\vee\psi \leftrightarrow
@@ -111,34 +113,76 @@ as its formal language, which, just as the model (structured set)
 theory chooses set theory for its semantics, can choose 
 (the hierarchical) {\it Topos} as its semantics 
 \cite{Introduction-to-higher-order-categorical-logic,
-categorical-logic-and-type-theory}. Later the Homotopy Type Theory
+categorical-logic-and-type-theory}. Later the Homotopy Type Theory(HoTT)
 \cite{homotopy-type-theory,univalence} also gives another 
-geometric interpretation for type theory. 
+geometric interpretation for type theory. The benefit of type
+theory is its intrinsic computational nature. Inference rules
+can be verify by a computer, a proof is constructive, 
+and the type hints a mathematician about his/her goal\cite{coq}.
+
+The computational explanation for logic also raises other problems.
+In general we can not compare two proofs. One can always write down
+redundant sentences amidst a proof, as is a redundant calculation
+abstraction. To find the shortest form of a calculation is known as
+the normalization problem in typed lambda calculus\cite{Curry-Howard}.
+Again, the Curry Howard correspondence provides us a way to compare two
+proofs. The meta-programming techniques, i.e generating some parts of
+the proof from the other, can also be applied to proving. A quick example
+is quantification elimination, which provides an algorithm to transfer
+each proof of a quantification-free formula to an equivalent one with
+quantifications under certain circumstances. Haskell
+turns its language into a category and uses monad to represent
+complicated computation process 
+\cite{the-essence-of-functional-programming}. 
+In \autoref{intuitionistic-logic},
+I will give a monadic proof for Glivenko's theorem, and make use of
+it as a monad in \autoref{monad-algebra}. A combinatory style logic 
+based on the continuation monad is also proposed born with computation 
+in its nature. 
+
+Based on these observations, a kind of constructive, categorical and 
+thus algebraic and combinatory logic is needed for mathematics. The
+syntactic part is developed with category theory and type theory in
+computer science, but most computer scientists care only about the
+syntax itself, ignoring its potential application in mathematics. 
+Recently, the HoTT rises for a explanation (semantics)
+of type theory in mathematics. It seems that topos theory is an
+explanation of it geometrically and the two theories also seem related.
+For my future, I hope I can understand the theories and fill in some
+blanks so that I have enough tools to learn mathematics with type
+theory. I hope they provide me an instrument to make my proof shorter
+and concepts easy to remember (It's easier to remember the Jordan
+canonical form with module theory then pure linear algebraically).
+
+My current difficulties lie in the understanding of $\infty$-groupoid
+used as a basic structure for HoTT. A lack of the whole
+picture also stops me from getting started. I've found a lot of 
+similarities among them, but I haven't found a universal explanation. 
+In this outline, I will briefly describe what I've observed. 
+\autoref{type-theory} defines the basic language used for the
+following and it is then related to logic in 
+\autoref{intuitionistic-logic}. The usage of monad and the further
+raise of combinatory logic are handled in \autoref{monad-algebra} and
+\autoref{combinatory-logic}. I also provide \autoref{monad-examples}
+for other examples of monad. The Homotopy Type Theory is discussed
+in \autoref{HoTT}. 
+
 
 \chapter{Type Theory}
 \label{type-theory}
 \chapter{Intuitionistic Logic}
+\label{intuitionistic-logic}
 \chapter{Monad and Algebra}
+\label{monad-algebra}
+
 \chapter{Combinatory Logic}
+\label{combinatory-logic}
+
 \chapter{Other Useful Examples}
+\label{monad-examples}
 
 \chapter{Homotopy Interpretation}
-
-\chapter{aaa}
-\section{Structure}
-This section's content...
-
-\subsection{Top Matter}
-This subsection's content...
-
-\subsubsection{Article Information}
-This subsubsection's content...
-
-\begin{equation}
-    x = a_0 + \cfrac{1}{a_1 
-            + \cfrac{1}{a_2 
-            + \cfrac{1}{a_3 + \cfrac{1}{a_4} } } }
-  \end{equation}
+\label{HoTT}
 
 \bibliographystyle{plain}
 \bibliography{ref}
