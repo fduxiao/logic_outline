@@ -285,3 +285,6 @@ TSWLatexianTemp*
 
 # output
 output/
+
+# OS X
+.DS_Store
