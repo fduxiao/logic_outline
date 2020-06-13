@@ -1,6 +1,33 @@
 \documentclass[12pt,a4paper]{report}
 
+\usepackage{proof}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{stmaryrd} 
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+\newcommand*{\definitionautorefname}{Definition}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
+
+\theoremstyle{remark}
+\newtheorem*{caveat}{\it CAVEAT}
+\newtheorem{remark}{\it Remark}[chapter]
+
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+
+\newcommand{\inv}{^{\raisebox{.2ex}{$\scriptscriptstyle-1$}}}
+\newcommand{\universe}{\mathcal{U}}
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\zero}{\mathbf{0}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\two}{\mathbf{2}}
+\newcommand{\defn}{:\equiv}
+\newcommand{\name}[1]{\text{\sf #1}}
+\newcommand{\proves}{\vdash}
+
 \usepackage{mathrsfs}
 \usepackage{titlesec}
 \usepackage{hyperref}
@@ -17,7 +44,7 @@
 
 \begin{document}
 
-\title{An Outline of Logic}
+\title{A Summary of Logic}
 \author{Xiao}
 \date{}
 \maketitle
@@ -27,20 +54,17 @@
 \input{intro.tex}
 \input{type.tex}
 
+\chapter{Homotopy Interpretation}
+\label{HoTT}
+
 \chapter{Intuitionistic Logic}
 \label{intuitionistic-logic}
 
-\chapter{Monad and Algebra}
-\label{monad-algebra}
-
-\chapter{Combinatory Logic}
-\label{combinatory-logic}
+\chapter{Monad}
+\label{monad}
 
 \chapter{Other Useful Examples}
 \label{monad-examples}
-
-\chapter{Homotopy Interpretation}
-\label{HoTT}
 
 \bibliographystyle{plain}
 \bibliography{ref}

@@ -3,14 +3,890 @@
 
 In this chapter, I mainly describe a basic language like set theory.
 The semantics of first-order language is strongly connected to sets.
-Every first-order formula represents a kind of set operation.
+Every first-order formula represents a kind of set operation or property.
 For example, we can prove a group of order prime squared is abelian.
 Let me first formalize it in first order logic. The language should
-have been $\mathscr{L}=(\cdot)$
+be $\mathscr{L}=(\ast)$, and the axioms are
+\begin{align*}
+    \Gamma & = \{ & \\
+        & \forall a b c\ a\ast(b\ast c)=(a\ast b)\ast c,\\
+        & \exists e(\forall a\ e\ast a=a\ast e = a)
+            \wedge (\forall a\exists a\inv(a\inv
+                \ast a = a\ast a\inv=e))\\ 
+    \}.
+\end{align*}
+The semantics behind these first order sentences is a set $G$,
+together with an extra operation $\cdot: G\to G$. The first 
+axiom says some property of this operation, while the second
+can be interpreted in two steps. Half of it, $\exists e
+(\forall a\ e\ast a=a\ast e = a)$\footnote{$\Gamma\models
+\exists e(\forall a\ e\ast a=a\ast e = a)$.}, asserts the
+existence of an element $e^G\in G$ such that for any element
+$a\in G$, $e^G\cdot a= a\cdot e^G=a$, and it is also easy to
+show this $e^G$ is unique in $G$. The other half claims every
+element is invertible. The language itself means operations in
+sets, i.e. the logic is split into two parts, the deduction rules and
+the set-theoretical semantics of it\footnote{The HoTT book
+\cite{homotopy-type-theory} gives a detailed description.}. When
+you are proving a proposition (well-formed formula), you follow the
+deduction rules to obtain a correct proof, while from the semantic
+side, each sentence you write gives you a judgement (equality or 
+existence) about the underlying set of the group. Now I want to say
+it has prime squared order $5^2$, thus adding to $\Gamma$ the axiom
+$\exists x_1\exists x_2\cdots\exists x_{25}, x_1\neq x_2\wedge\cdots
+\wedge x_{24}\neq x_{25}\wedge\forall y, y=x_1\vee\cdots\vee y=x_{25}$. 
+Since semantically we know it's true that any such a group(model) is 
+abelian, then there must be a syntactic proof of the sentence 
+$\forall x\forall y\ x\ast y=y\ast x$ (completeness).
 
-The axioms are
+I don't konw what exactly the proof is (you may want to try proving it 
+with pure first order logic), but let me show what's the semantic proof. 
+Normally, the proof of the abelianity is that for any group $G$ of order 
+$p^2$, where $p$ is a prime, we can pick the center 
+$Z =  \{g\in G\mid\forall a\in G\ ag=ga\}$ of it. Thus it can only has 
+order $1$ or $p$ or $p^2$. According to the class equation, 
+$|G| = |Z| + \sum_iC_i$, where $C_i$ are conjugation classes. Thus $|Z|$
+can only be $p$ or $p^2$. If $|Z|\neq p^2$, pick an $x\in G\setminus Z$
+The centralizer $Z(x) = \{g\in g\mid gx=xg\}$ must have order $p^2$, i.e.
+$x$ should be in $Z$, which is a contradiction.
+
+In general, we use a semantic proof everywhere. From the perspective of
+first order language, we define how the set (model) structure is formed,
+while in real world, we perform the computation (of sets) directly. If
+you know how the computation is made, you must be able to write down the
+proof (though it may be very difficult, as the example above). Now think
+what are the first order language and its inference rules. In mathematical 
+logic, the langauge itself is defined as object (set), and the rules are
+defined as computations (some kind of functions). (Note both the 
+{\it modus ponens} and axioms represent whether you are allowed to 
+introduce or eliminate certain sentences. Just think them as buttons on
+a calculator.) Again, the axioms in ZFC (when ZFC is considered as the
+identical but distinct version of the one we use in meta langauge) are 
+also such rules. In summary, the logic language is the object, our
+inference is doing computations just like applying a function to an
+element deriving another. 
+
+This coincidence (the inference rules can be viewed as 
+object operations ) is called {\it Curry-Howard 
+Correspondence}. But instead of set theory, typed lambda calculus
+\cite{Curry-Howard} is chosen for it, mainly because it's more natural 
+in computer programming \cite{coq,SF}, and some syntactic rule of lambda 
+calculus coincides with modus ponens. So you won't have to treat the 
+first order language specially, or you may get Rousell's paradox
+(one layer of deduction system and syntax and another layer of semantics). 
+Look at the group above, the semantic proof is very natural in our 
+language, but is not applicable pure syntactically. In the rest of this 
+chapter I'm going to introduce the type theory (mainly a re-illustration 
+of the first chapter of \cite{homotopy-type-theory}). Bear in mind that 
+everything is associated with a construction and under such a scheme, 
+no extra relation between the first order layer and the semantic layer
+is needed. 
+
+\section{Lambda-Calculus}
+The core of our language is the lambda calculus. I first start with a
+untyped version of them, and then give a simply-typed version. You don't
+have to think about its real meaning. Just play with it until you are
+happy with this concept. (See chapter 1, 3 of \cite{Curry-Howard})
+
+Let 
+$V=\{v_0, v_1, \cdots\}$ be a variable set. Our objects, the 
+$\lambda$-$terms$, are defined as follows\footnote{This notation is
+called the backus normal form}. 
+
+\begin{definition}\label{lambda-term}
+    $$\Lambda ::= V \mid (\Lambda\ \Lambda) \mid (\lambda V\ \Lambda)$$
+\end{definition}
+
+You can understand it as:
+\begin{enumerate}
+    \item A variable is a $\lambda$-$term$.
+    \item If $T_1$ and $T_2$ are $\lambda$-$terms$, then so is $(T_1\ T_2)$.
+    This is called an application.
+    \item If $x\in V$ is a variable, $T$ is a $\lambda$-$term$, then so
+    is $(\lambda x\ T)$. This is called an abstraction. 
+\end{enumerate}
+
+The abstraction is something like $f(x) = x^2 + 1$. Equivalently, you
+can define it as $f=\lambda x\ (x^2+1)$, though $2,+,1$ are not defined.
+As you may guess, the application is purely substitution.
+
+\begin{definition}\label{beta-reduction}
+    We define a relation $\to_\beta$ between $\lambda$-terms
+    $$((\lambda x\ P) Q) \to_\beta P[x:=Q],$$ where $P[x:=Q]$ means the 
+    substitution of $Q$ for every occurence of $x$ in $P$. 
+\end{definition}
+
+For example $((\lambda x\ (x+x))\ 2)\to_\beta(x+x) = 4$, though
+this is certainly not well defined. I believe you can figure out what
+I mean. This means a step of calculation, called $\beta$-reduction.
+In \cite{homotopy-type-theory}, this is the computation rule for function
+type. The relation $\to_\beta$ is defined for the application of an 
+abstraction and another term. You may want its transitive closure 
+$\twoheadrightarrow_\beta$ (multiple steps of $\beta$-reduction) or 
+reflexive closure $=_\beta$ (they can be both reduced to the same
+$\lambda$-term).
+
+As you may guess again, there's also the annoying problem about free
+variables. Let me first make some conventions for convenience (to
+avoid too many parentheses). 
+\begin{enumerate}
+    \item $(\lambda x\ \lambda\ y\ T)$ is $(\lambda x\ (\lambda y\ T))$.
+    This is called {\it currying}, i.e., a function $f: X\times Y\to Z$ is
+    a function mapping each $x\in X$ to a function $f(x): Y\to Z$ 
+    (Adjunction of the category $Set$)
+    \item In response, $(K\ L\ M)$ is $((K\ L)\ M)$, just like $f(x, y)$
+    is $f(x)(y)$ (Note $f(x): Y\to Z$ is a function). 
+    \item $(\lambda x\ M\ N)$ is $(\lambda x\ (M\ N))$.
+    \item $(M\ \lambda x\ N)$ is $(M\ (\lambda x\ N))$.
+\end{enumerate}
+
+The outermost parentheses are also omitted if that won't cause ambiguity.
+We also write $\lambda x_1 x_2\cdots x_n.M$ for 
+$(\lambda x_1\ (\lambda x_2\ (\cdots(\lambda x_n\ M))))$. Another notable
+observation is that the abstraction is independent of the varible used.
+For example $\lambda x.x$ and $\lambda y.y$ are identical. You can freely
+change the variable used, but be careful about the `naming conflict'. 
+The term $\lambda x. \lambda x. x\ x$ is understood as 
+$\lambda y. \lambda x. x\ x$. (The renaming process is called {\it
+$\alpha$-conversion}. )
+
+For the real world, you can introduce numbers and basic arithematics like
+the example $\lambda x. x \cdot 2 + 1$, but for a pure theoretical 
+purpose, you can define the numbers as $c_n=\lambda s.\lambda z. s^n\ z$, 
+where $s^n\ z = s\ (s\ (\cdots\ (s\ z)))$. Those $c_n$ are called {\it
+Church numeral}. Try to prove the term $A_+=\lambda x.\lambda y.\lambda s
+.\lambda z.x\ s\ (y\ s\ z)$ satisfies the relation 
+$A_+\ c_n\ c_m=_\beta c_{m+n}$. Consider what are the multiplication and 
+exponent. The last example is only available in untyped lambda calculus,
+the fixed point combinator. Compared with the traditional 
+$$\mathbf{Y} = \lambda f.(\lambda x.f\ (x\ x))\ \lambda x.f\ (x\ x)$$
+such that for any $\lambda$-term $F$, 
+$F\ (\mathbf{Y})=_\beta \mathbf{Y}\ F$, the exercise in chapter 1 of 
+\cite{Curry-Howard} is more interesting. Let
 $$
-\Gamma = \{
-    \forall a b, c
-\}
+\begin{array}{lll}
+    ? &=& \lambda abcdefghijklmnopqstuvwxyzr.r\ (thisisafixedpointcombinator) \\
+    \$ &=& ??????????????????????????
+\end{array}
 $$
+Prove that $\$\ F=_\beta F\ (\$\ F)$ for all $F\in\Lambda$.
+
+Then let's talk about typed lambda calculus. All the terms we defined
+above can be applied to any other term, but for a function 
+$f: \mathbb{N}\to\mathbb{N}$, you won't apply it to $\sqrt 2$ and 
+you won't expect the result is an element of the set $\{cat,dog,duck\}$.
+Thus we attach each $\lambda$-term with such an annotation. 
+
+Let $U$ be the set of all {\it type variables}. Define the set 
+$\Delta$\footnote{In \cite{Curry-Howard}, the letter for such a set is
+$\Pi$, but this is used for dependent function type ($\Pi$-type) 
+(\autoref{dependent-function}) in HoTT, so I change the notation.} as
+$$
+    \Delta ::= U \mid \Delta \to \Delta
+$$
+Now the $\lambda$-terms occur with a type in $\Delta$. For example,
+$\lambda x. x: a\to a$ for some $a\in U$. Formally speaking, the
+notation `:' is introduced as follows. 
+
+A context is such a set $\Gamma = \{x_1: \tau_1, \cdots, x_n:\tau_n\}$ 
+with $x_i\in U$ and $\tau_i\in V$. ($U$, $V$ are variables for 
+$\lambda$-terms and types respectively.) We define the {\it typability}
+relation $\proves$ on the set of all triples $(\Gamma, x, \tau)$, where 
+$x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
+
+\begin{enumerate}
+    \item $$\infer{\Gamma, x:\tau\proves x:\tau}{}$$
+    This means without any premise (the blank on the line), you
+    are allowed to define $\proves$ for triple 
+    $(\Gamma\cup\{x:\tau\}, x, \tau)$
+    ($\Gamma,x:\tau$ means $\Gamma\cup\{x:\tau\}$).
+    \item $$\infer{\Gamma\proves\lambda x.M:\sigma\to\tau}{\Gamma,x:\sigma\proves M:\tau}$$
+    This means if you have defined the relation $\Gamma,x:\sigma\proves M:\tau$,
+    then you can obtain a new relation $\Gamma\proves\lambda x.M:\sigma\to\tau$.
+    (introduction rule for $\to$)
+    \item $$\infer{\Gamma\proves M\ N:\tau}{\Gamma\proves M:\sigma\to\tau & \Gamma\proves N:\sigma}$$
+    This means you can eliminate the arrow $\to$ in the type by application.
+\end{enumerate}
+
+Note we start with the context $\Gamma$, where only variables are annotated
+by types. Our target is to define how the $\lambda$-terms are annotated.
+Thus a suitable target is to introduce all $\to$ until $\Gamma$ is empty
+(rule 2). For example
+\begin{enumerate}
+    \item $\proves \lambda x.x: \sigma\to\sigma$
+    \item $\proves \lambda x.\lambda y.x: \sigma\to\tau\to\sigma$ \\
+    (according to currying, $\sigma\to\tau\to\sigma$ should be 
+    $\sigma\to(\tau\to\sigma)$)
+    \item $\proves \lambda f.\lambda g.\lambda a. f\ a\ (g\ a):
+    (A\to(B\to C))\to(A\to B)\to(A\to C)$
+\end{enumerate}
+
+Coincidently, the context can be given another interpretation. The 
+{\it range} of a context $\Gamma$ is defined by
+$|\Gamma|=\{\tau\in\Delta\mid(x:\tau)\in\Gamma\}$. The type set $\Delta$
+can also be understood as the set of all well formed formulas (without
+conjunction or disjunction) in propositional logic. Then you can easily 
+observe the following theorem.
+\begin{theorem}
+    (Curry-Howard Correspondence).
+    \begin{enumerate}
+        \item If $\Gamma$ is a context and $\Gamma\proves M:\phi$, then
+        $|\Gamma| \proves \phi$ in (intuitionistic) propositional logic
+        \footnote{See \autoref{intuitionistic-logic}}.
+        \item If $\Gamma\proves \phi$ in IPC 
+        ({\bf I}ntuitionistic {\bf P}ropositional {\bf C}alculus), then
+        you can define a context $\Gamma'=\{(x_\theta):\theta\mid\theta\in\Gamma\}$
+        and find an $M: \phi$ such that $\Gamma'\proves M:\phi$. 
+    \end{enumerate}
+\end{theorem}
+
+The previous discussion is mainly for application of functions, 
+i.e. the {\it implicational fragment} of propositional logic.
+Actually we only defined rules for how a `function type' $\sigma\to\tau$
+is constructed by some $\lambda$-term and how to compute it by application.
+
+We adopt the same style to define types for conjunction and disjunction.
+The type set $\Delta$ is extended to
+$$
+\Delta ::= V\mid\Delta\to\Delta\mid\Delta\times\Delta\mid\Delta+\Delta
+$$
+with following annotating rules:
+$$
+\infer{\Gamma\proves (M, N): \sigma\times\tau}{\Gamma\proves M:\sigma, N:\tau}
+\ \ \ 
+\infer{\Gamma\proves \pi_1(L):\sigma}{\Gamma\proves L: \sigma\times\tau}
+\ \ \ 
+\infer{\Gamma\proves \pi_2(L):\tau}{\Gamma\proves L: \sigma\times\tau}
+$$
+$$
+\infer{\Gamma\proves \left<1, M\right>:\sigma + \tau}{\Gamma\proves M:\sigma}
+\ \ \ 
+\infer{\Gamma\proves \left<2, N\right>:\sigma + \tau}{\Gamma\proves N:\tau}
+$$
+$$
+\infer{\Gamma\proves \text{\bf case}(L;x.M;y.N): \rho}{
+    \Gamma\proves L:\sigma+\tau &
+    \Gamma, x:\sigma\proves M:\rho &
+    \Gamma, y:\tau\proves N:\rho
+}
+$$
+where 
+$$
+\begin{array}{c}
+    \pi_1((M_1, M2)) \to_\beta M_1 \\
+    \pi_2((M_1, M2)) \to_\beta M_2 \\
+    \\
+    \text{\bf case}(\left<1, N\right>;x.K;y.L)\to_\beta K[x:=N] \\ 
+    \text{\bf case}(\left<2, N\right>;x.K;y.L)\to_\beta L[y:=N]
+\end{array}
+$$.
+
+Of course, you may want to extend the $\lambda$-term to have such
+syntactic definitions, but actually they can be expressed by lambda
+calculus directly \cite{Curry-Howard} (in an inconvenient way). 
+I prefer to define them syntactically instead of using lambda terms.
+(The technique used to define those $\lambda$-terms is called {\it CPS 
+transformation}, which is another interesting theoretical thing.)
+
+\begin{caveat}
+    \label{constructor-destructor}
+    The notations $\pi_i$ and $\text{\bf case}$ are defined syntactically
+    just like the lambda abstraction and application. They can only be
+    introduced or eliminated according to the rules above. You cannot
+    understand them like tuples in set theory. Instead, a better
+    understanding is that you actually defined such constructors 
+    $(,)_{\sigma\times\tau}: \sigma\to\tau\to\sigma\times\tau$ (the comma
+    in the tuple) and $inj^1_{\sigma\times\tau}: \sigma\to\sigma+\tau$, 
+    $inj^2_{\sigma\times\tau}: \tau\to\sigma+\tau$ like you are allowed
+    to write the lambda abstraction. Similarly, the application $(M\ N)$
+    never requires that $M$ should be an abstraction, you just think it 
+    as an `applicable' term (e.g, with type $\sigma\to\tau$). You don't 
+    know whether it has the form $(\lambda x.\cdots)$. It's purely a
+    syntactic symbol. The type $\sigma\times\tau$ is also a symbol. We
+    do not assume any structure like $(M, N)\in M\times N$. To make
+    use of it, we define the destructor $\pi_1:\sigma\times\tau\to\sigma$
+    and $\pi_2:\sigma\times\tau\to\tau$ and the computation rule. That is
+    when you apply a constructor to a destructor, what should happen.
+    Like the application $(M\ N)$, if $M$ is an abstraction, then we can 
+    perform the $\beta$-reduction. This will be called {\it induction 
+    rule} later with a more general description. That is to define
+    such a rule, we only need to define them on all constructors.
+    When a destructor is applied to a constructor, we define what is a
+    reduction; outherwise, they are pure symbols (like $(M\ N)$).
+    (You may want to think of them as axioms. The powerset axiom allows 
+    you to define a set from another and others define how to use it.)
+\end{caveat}
+
+The above is the counterpart of propositional logic, which we often
+refer to as {\it simply typed $\lambda$-calculus}.
+
+\section{The Usage of Meta Language}
+Though we have two things, $\lambda$-terms and types, as in set theory,
+we will call them both `type'. A term must be introduced with its type 
+and the type itself can be considered as the element in a higher order 
+type universe. However the relation `$:$', unlike `$\in$', is not a 
+propositional relation. This relation is judged in our meta-language. 
+(Think about the rules above. The `$:$' relation is not derived from a 
+rule, but a syntactic constraint.) According to the Curry-Howard 
+Correspondence, when a proposition $A$ is provable if and only if a term 
+$a$ of this type is constructable ($A$ is inhabited by $a$). Thus the 
+relation $a:A$ is precisely the relation $\proves$ in our meta language. 
+
+Another thing is the equality. In first order logic, we have a distinct
+symbol `$\doteq$' for the language, but it is interpreted as the identity
+in the model, i.e. the meta-language. In type theory, they are called
+propositional equality and judgemental equality. We may prove `$=$' as
+a proposition (we can find a term of this type), while the $\alpha$-
+conversion (renaming of a $\lambda$-term) shows another equality, i.e.
+the judgemental equality, an equality prior to the existence of type
+theory. This judgement or definitional equality is denoted by `$\equiv$',
+or sometimes to emphasize it's a definition, I will use `$\defn$'. In 
+the rest of this chapter and \autoref{HoTT}, `$=$' will always mean
+propositional equality as a type, and `$\equiv$' is the normal equality
+we use for mathematics (judgemental equality). In other chapters, I will 
+still use `$=$'. 
+
+Now the only things we have to handle is the relation `$:$' and the 
+judgemental equality $\equiv$. And I will roughtly describe how I should
+introduce a new type. To define the {\it function type} `$\to$', we first 
+define the syntax for the type set, i.e., if $A$ and $B$ are type, then 
+so is $A\to B$. This is called the {\bf formation rule} for $\to$. Then 
+we have to show when this type is {\it inhabited}, i.e. to define an 
+element $f$ of this type $f:A\to B$, I have to use $\lambda$-abstraction. 
+This extends the syntax of $\lambda$-term. Such a syntax is called the 
+{\bf constructor} of a new type (Another example is the comma 
+$(,): A\to B\to A\times B$. Though I write it as a function, it is not 
+defined as a function, but a new syntax. The abstraction can never be 
+described by a simpler term. Actually you can even introduce more syntax 
+like the abstraction, e.g. the $\lambda\mu$-calculus 
+\cite{lambda-mu-calculus}.) We also define the {\bf computation rule} 
+$(\lambda x. M)\ N \defn M[x:=M]$ showing the {\bf elimination rule} 
+for the function type. And we define the $\alpha$-conversion to identify 
+two $\lambda$-terms, which is called the {\bf uniqueness rule}.
+
+\section{The Universe of Type}
+\label{type-universe}
+I've only defined the syntax for types so far, but you may want to
+ask, what is a type or what is the `universe' for types, just like the 
+`set' of all sets? As in set theory, if the universe includes itself then
+we will encounter Russell's paradox \cite{the-paradox-of-trees-in-type-theory}.
+Instead, we define a hierarchical universe.
+$$
+    \universe_0: \universe_1: \universe_2: \cdots.
+$$
+This means each universe can be referred to in the language under a higher
+level universe. We also require that if $A: \universe_i$ then 
+$A: \universe_{i+1}$, but it has the disadvantage that an element won't
+have a unique type and if you `proved' a theorem in $\universe_i$,
+then you have to prove it again in universe $\universe_{i+1}$ because
+you have more elements though the proofs are the same\footnote{In Idris
+and Agda, the universe can be written in a `polymorphic' way, i.e. they
+use dependent function type (\autoref{dependent-function}) to avoid this problem, maybe
+this is a good solution in engineering. I'm not sure whether this will break
+the consistency of the logic, but this inconvenience won't be a problem
+in our development of type theory}. 
+
+One would like to omit the subscription $i$ thus ignoring the 
+inconvenience to some extent. For example, $A:\universe$ should have been 
+some $A:\universe_i$ and $\universe:\universe$ is 
+$\universe_i:\universe_{i+1}$, but be carefule that 
+$\lambda(i:\nat). \universe_i$ is not a well defined term (The type 
+$\nat$ will be introduced later, and $U_i$ is also understand as term.
+There's no difference between a type and an element of that type. They
+are all called {\it type}\footnote{In contrast to the traditional
+programming language where {\it type} and {\it data} are different concepts}).
+
+We need the universe $\universe$ to index a family of types, e.g. 
+$B:A\to\universe$. A typical case is that when this $B$ is a `constant'
+function. Let me also write that constant as $B:\universe$. Thus we can define
+the constant function $(\lambda(x:A).B):A\to \universe$.
+
+
+\section{Dependent Function Type}
+The type family, as you may guess, is used to define some {\it polymorphic}
+functions. For example a function of type $(A\to(B\to C))\to(A\to B)\to
+(A\to C)$ can be define for every type $A, B, C$. You may expect such
+a function with quantifier: $\forall (A\ B\ C: \universe), 
+(A\to(B\to C))\to(A\to B)\to (A\to C)$, and define the term
+$\lambda (A:\universe).\lambda (B:\universe).\lambda (C:\universe).\lambda (f: A\to B\to C).
+\lambda (g: A\to B).\lambda (a: A). f\ a (g\ a): \forall (A\ B\ C:\universe), 
+(A\to(B\to C))\to(A\to B)\to (A\to C)$.
+
+Look at the term I defined above, it's too long to be readable and apparently, 
+this is unnecessary. Once we give the type $\forall (A\ B\ C:\universe), 
+(A\to(B\to C))\to(A\to B)\to (A\to C)$, we can infer the type of each 
+variable in $\lambda A.\lambda B. \lambda C. \lambda (f: A\to B\to C). 
+\lambda (B: A\to B).\lambda a. f\ a\ (g\ a)$ (though I add the redundant
+types to $f$ and $g$ as hints). Actually there are two type systems, the
+one I introduced is called {\it typing \`a la Curry}, which is a process
+giving types to $\lambda$-terms. In contrast, there's another {\it typing
+\`a la Church} which forces every variable to be assigned with a type.
+Thue Curry typing is helpful when you want to write less type notations 
+while the Church typing is how we write a proposition. There are some
+further similarity and difference between these two type systems. For
+more details, see Chapter 3 of \cite{Curry-Howard}. Actually I was
+cheating because the Curry-Howard Correspondence should have been stated
+with typing \`a la Church, but as you see, we don't have to be that strict
+with ourselves. Generally I will write the type explicitly, but if it can
+be inferred from the context, why not just omit them? The quantifiers also
+gives us a way to get rid of `free variables', and we don't need to be that
+strict. I will perhaps use subscriptions to indicate the bounded variables.
+(For example, $f_{ABC}: (A\to B\to C)\to(A\to B)\to(A\to C)$).
+
+In type theory, the `universal quantifiers' are represented by {\it
+dependent function type ($\Pi$-types)}.
+
+\begin{definition}
+    \label{dependent-function}
+    (Dependent function Type) Given a type $A:\universe$ and a family 
+    $B:A\to\universe$, we form a new type $\Pi_{(x:A)}B(x): \universe$.
+
+    The constructor for this type is still the lambda abstraction,
+    but it allows you to introduce a type as a variable after the $\lambda$
+    notation and that can be used in type annotation of a varaible later.
+
+\end{definition}
+
+For example the term $\lambda (A:\universe).\lambda (B:\universe).\lambda (C:\universe).\lambda (f: A\to B\to C).
+\lambda (g: A\to B).\lambda (a: A). f\ a (g\ a)$ is such a constructor.
+The dependent function type is a generalization of functions, for if
+$B:A\to\universe$ is a constant function, the type $\Pi_{(x:A)}B$ is
+the ordinary function $A\to B$. Sometimes the $\Pi$-type is called 
+dependent function or dependent type. The name $\Pi$ is due to the fact
+that dependent function can give a way to define product (exercise in
+chapter 1 of \cite{homotopy-type-theory}).
+
+Let me show some other examples.
+
+\newcommand{\swap}{\name{swap}}
+
+$$
+    \swap: \prod_{A:\universe}\prod_{B:\universe}\prod_{C:\universe}
+    (A\to B\to C)\to (B\to A\to C)
+$$
+$$
+    \swap \defn \lambda A.\lambda B.\lambda C.\lambda g.
+    \lambda b.\lambda a. g\ a\ b
+$$
+
+It is not wise to write so many $\lambda$s. Sometimes I accept the
+traditional manner to define a function, i.e. I define the `{\bf swap}' as
+$$
+    \swap\ A\ B\ C\ g \defn \lambda b.\lambda a.g\ a\ b.
+$$
+
+This is understand as given the type $A,B,C$ and a function $g:A\to B\to C$,
+{\bf swap} gives you a new function, which takes two arguments $b,a$ and gives
+you the result $g\ a\ b$. Since the space is not `\LaTeX-friendly', I may still
+use the notation 
+$$
+\swap(A,B,C,g)\defn \lambda b.\lambda a.g(a)(b).
+$$
+Be sure to distinguish this from tuple. (Especially when it comes to $f\ (a, b)$),
+the application of a function to a tuple. You may also want to express this
+as $(f\ (a, b)),f((a,b)),f(a,b)$ or the curried function $f(a)(b)$).
+
+You can also use subscriptions to define it
+$$
+    \swap_{A,B,C}(g)(b,a) \defn g(a, b).
+$$
+
+The identity function is defined as
+\newcommand{\id}{\name{id}}
+\eq{
+    \id &: \prod_{A:U} A\to A \\
+    \id_A(x) &\defn x
+}
+
+\newcommand{\Id}{\name{Id}}
+(This is the identity function, while later the type $\Id_A(a, b)$ 
+will mean the equality of two elements $a,b:A$). 
+
+\section{Inductively Defined Natural Numbers}
+This time, we define a type with multiple constructors and induction.
+Actually there should be some extra requirements\footnote{Inductive types
+are initial algebras. In programming language Haskell, they are called
+Algebraic data type} for induction because you may easily define the 
+Rousell's paradox or some similar one (See chapter 5 of 
+\cite{homotopy-type-theory}). 
+
+The natural numbers $\nat$ is defined as a brand new type with
+constructors $0: \nat$ and a successor function \newcommand{\succn}{\name{succ}} 
+$\name{succ}:\nat\to\nat$. We also adopt the decimal notation 
+$1 \defn \succn(0), 2\defn\succn(1)$. Though I write the $\succn$ like a
+function, it behaves a bit different from a normal function. For example,
+if $\succn(a) = \succn(b)$, we may then assume $a = b$ (equality is introduced
+later), and we have to show how to `make use of' an element $n:\nat$.
+To construct a function $f:\nat\to C$, I have to define what happens for
+constructor $0: \nat$ and when $f(n)$ is defined, how to define $f(\succn(n))$.
+Let $c_0:C$ and $c_s:\nat\to C\to C$ be two functions, we actually want
+the (computation) rules
+
+\eq{
+    f(0) & \defn c_0 \\
+    f(\succn(n)) &\defn c_s(n,f(n)).
+}
+
+In computability theory (recursion theory), this way to define a function
+is called {\it primitive recursion}. 
+
+\newcommand{\rec}{\name{rec}}
+
+Though I give the universe of types, I still want to handle this pure 
+syntactically. Instead of thinking $\nat$ consists of only $0$ and $\succn$,
+this definition rule is written as the following recursion rule (the axioms
+are symbolic).
+$$
+    \rec_\nat:\prod_{C: U}C\to(\nat\to C\to C)\to\nat\to C
+$$
+with computation rules
+\eq{
+    \rec_\nat(C, c_0,c_s,0) &\defn c_0 \\
+    \rec_\nat(C, c_0,c_s,succ(n)) &\defn c_s(n, rec_\nat(C,c_0,c_s,n))
+}
+For example we can define the sum of two natural numberes;
+$$
+    \name{add}: \nat\to\nat\to\nat
+$$
+$$
+    \name{add} \defn \rec_\nat(\nat\to\nat,\id_\nat,\lambda n.\lambda g.\lambda m.\succn(g(m)))
+$$
+This is, $\name{add}$ is a function from $\nat$ to $\nat\to\nat$ (when 
+$C$ is $\nat\to\nat$). To define such a function, we first define 
+$\name{add}\ 0$, which is apparently the identity function 
+($0+n \defn n$), and if $\name{add}\ n$ is defined, we define 
+$\name{add}\ (\succn\ n)$ to be the function which takes a number, applies
+the previous $\name{add}\ n$ and takes the successor of the result, i.e.
+a function $c_s(n:\nat, g:\nat\to\nat) \defn (\lambda m.\succn(g(m)): \nat\to\nat)$
+($\name{add}(\succn(n))\defn \lambda m. \succn(add(n, m))$, i.e. 
+$\name{add}(\succn(n), m)\defn \succn(add(n, m))$). (It's convenient
+to write $\name{add}(n, m)$ as $n+m$)
+
+Similarly we have 
+$$
+    \name{double}: \nat\to\nat
+$$
+$$
+    \name{double} \defn \rec_\nat(\nat, 0, \lambda n.\lambda y.\succn(\succn(y))),
+$$
+and the predecessor
+\newcommand{\pred}{\name{pred}}
+$$
+    \pred: \nat\to\nat
+$$
+$$
+    \pred \defn \rec_\nat(\nat, 0, \lambda n.\lambda m. n),
+$$
+where $\pred(0)\defn0$ and $\pred(\succn(n))\defn (\lambda n.\lambda m. n)\ n\defn n$.
+
+In the previous examples, you may notice that it suffices to define the
+so called `computation rule' on each constructor. Actually there's a
+{\it pattern matching} manner to define a recursive function, e.g. the
+$\pred$ can be defined as
+\eq {
+    \pred(0) &\defn 0 \\
+    \pred(\succn(n)) &\defn n
+}
+and the $\name{add}$ is defined as
+\eq {
+    0 + m &\defn m \\
+    (\succn\ n) + m &\defn \succn\ (n + m).
+}
+
+But be sure such a definition can be written with $\rec$, or you may
+get some pathological thing, e.g.
+\eq{
+    \name{loop\_false} &: \nat\to C \\
+    \name{loop\_false}(n) &\defn \name{loop\_false}(n)
+}
+where $C:\universe$ is an arbitrary type. A system where every term
+can be derived is inconsistent. Later I will construct a type $\zero$ 
+without constructors. When $C$ is $\zero$, $\name{loop\_false}(0):\zero$ 
+means absurdity (because no constructor is provided). So far we haven't
+defined any `partial functions'. A turing machine may never {\it halt}
+and $\name{loop\_false}$ is such a case. (This could be understood as a
+computational version of Godel's incompleteness theory.)
+
+Let's generalize this rule $\rec$ a bit. Suppose now I'm going to define
+a dependent function on $\nat$ or predicate something about natural numbers,
+i.e. you have the type $C: \nat\to\universe$. This is easily understand as
+a predicate and to prove something about natural numbers, we can use inductions:
+$$
+    \infer{\Pi_{n:\nat}C(n)}{C(0) & \Pi_{n:\nat}(C(n)\to C(\succn(n)))}
+$$
+\newcommand{\ind}{\name{ind}}
+Thus we have an induction rule 
+$$
+\ind_\nat: \prod_{C:\nat\to\universe}C(0)
+    \to(\Pi_{n:\nat}C(n)\to C(\succn(n)))
+    \to\Pi_{n:\nat} C(n).
+$$
+
+This is a generalized computation or elimination rule because when
+$C$ is a constant type, it is just the recursion rule $\rec_\nat$. 
+Thus we also have the following computation rule.
+\eq{
+    \ind_\nat(C,c_0,c_s,0) &\defn c_0 \\
+    \ind_\nat(C,c_0,c_s,\succn(n)) &\defn c_s(n,\ind_\nat(C,c_0,c_s,n))
+}
+From our definition, this should be the only way to make use of a type.
+See chapter 5 of \cite{homotopy-type-theory}. 
+
+\newcommand{\refl}{\name{refl}}
+Let me show you how to make use of this rule. There's a obvious `proposition'
+$\forall n:\nat, n + 0 = n$. (Note from the computation rule, we only know
+$0+n=n$.) The $=$ type is not introduced yet but its constructor is quite 
+simple. Given a type $A:\universe$ and $x,y:A$, you can {\it form} a new 
+type $x=_Ay$ while the only constructor for this type is $\refl_x: x=_Ax$. 
+(Note that syntactically the {\it formation rule} always allows you to 
+give a new type while the relation `$:$' is defined only by constructors.)
+
+To prove that proposition, I expect the type $\Pi_{(n:\nat)}n+0 =_\nat n$
+to be inhabited. According to the induction rule, I choose $C: \nat\to\universe$
+to be $C(n)\defn n+0=_\nat n$. 
+Now, I only need to `prove' $C(0)$ and $\Pi_{n:\nat}C(n)\to C(\succn(n))$.
+
+$$
+    C(0) \defn 0 + 0 =_\nat 0
+$$
+According to the computation rule, we know $0 + 0\defn 0$. Thus
+$\refl_0: C(0)$ will be the witness. Now for the `induction step',
+I reform the target as
+$$
+\infer{\succn(n) + 0 =_\nat \succn(n)}{n:\nat & n+0=_\nat n}
+$$
+According to the computation rule 
+$\succn(n) + 0 =_\nat \succn(n)\defn \succn(n+0)=_\nat\succn(n)$. 
+Now let's admit the leibniz rule 
+$$
+    \name{leibniz}: \prod_{A,B:\universe}\prod_{f:A\to B}\prod_{x,y:A}
+        x=_Ay\to f(x)=_Bf(y)
+$$ 
+(though I am reluctant to do, but it seems that without equality I could
+hardly prove anything. This will be introduced later.)
+Clearly the type $\Pi_{n:\nat}C(n)\to C(\succn(n))$ can be inhabited by
+$$
+    \lambda (n:\nat).\lambda (eq:n+0=_\nat n). \name{leibniz}
+    (\nat,\nat,\succn,n+0,n,eq). 
+$$
+This example also shows the difference between `judgemental equality' 
+and `propositional equality'. The symbol $n+0$ will never equal $n$
+judgementally, but they can be proved equal. 
+
+\section{Some Simple Types}
+Now that we have seen how a complicated type is defined (actually we
+extend the typed lambda calculus), let me introduce some simpler types.
+\newcommand{\inl}{\name{inl}}
+\newcommand{\inr}{\name{inr}}
+\begin{enumerate}
+    \item The {\it product type} is defined with constructor {\it comma}
+    $(,)_{A,B}:A\to B\to A\times B$. Actually if we have $a: A,b: B$, then
+    we write $(a, b): A\times B$ omitting a lot of extra syntactic requirements.
+    The {\it recursor} and {\it induction principle} are
+    $$
+    \rec_{A\times B}: \prod_{C:\universe}(A\to B\to C)\to A\times B\to C \\
+    $$
+    $$
+    \rec_{A\times B}(C,g,(a,b)) \defn g(a)(b)
+    $$
+    $$
+    \ind_{A\times B}:\prod_{C:A\times B\to\universe}
+        (\prod_{x:A}\prod_{y:B}C((x,y)))\to\prod_{x:A\times B}C(x)
+    $$
+    $$
+        \ind_{A\times B}(C,g(a,b))\defn g(a)(b)
+    $$
+    Here I defined the recursor and induction rules, instead of the
+    equivalent $\pi_1,\pi_2$. They are defined as 
+    $\pi_1\defn\rec_{A\times B}(A,\lambda a.\lambda b. a)$
+    $\pi_2\defn\rec_{A\times B}(A,\lambda a.\lambda b. b)$.
+    \item The unit type $\one$ is defined with only one constructor without
+    any extra parameters ($\star:\one$). The recursor and induction principle
+    are 
+    $$
+        \rec_\one:\prod_{C:\universe}C\to\one\to C
+    $$
+    $$ 
+        \rec_\one(C,c,\star) \defn c
+    $$
+    $$
+        \ind_\one:\prod_{C:\one\to\universe}C(\ast)\to\pi_{x:\one}C(x)
+    $$
+    $$
+        \ind_\one(C,c,\ast) \defn c
+    $$
+
+    \item Given $A, B:U$, we form the {\it coproduct type} $A+B$ with
+    constructors $\inl:A\to A+B$ $\inr:B\to A+B$ (`left injection' and
+    `right injection'). The induction principle is
+    $$
+        \ind_{A+B}: \prod_{C:(A+B)\to\universe}
+            (\prod_{a:A}C(\inl(a))) \to
+            (\prod_{b:B}C(\inr(b))) \to
+            \prod_{x:A+B} C(x)
+    $$
+    $$
+        \ind_{A+B}(C,g_0,g_1,\inl(a))\defn g_0(a)
+    $$
+    $$
+        \ind_{A+B}(C,g_0,g_1,\inr(a))\defn g_1(a)
+    $$
+    \item The type $\one$ is the nullary-product (terminal object). We 
+    can similarly define the nullary-coproduct $\zero:\universe$. There's
+    no way to construct the inhabitant of such a type, and we can easily
+    figure out the induction principle 
+    $\ind_\zero: \prod_{C:\zero\to\universe}\prod_{z:\zero}C(z)$. The
+    simpler version $\rec_\zero:\prod_{C:\universe}\zero\to C$ implies
+    that if $\zero$ had been inhabited, then any type, including itself, 
+    would have been inhabited, i.e., any `proposition' would have been 
+    provable. We then consider $\zero$ as absurdity $\bot$ in intuitionistic
+    logic and I can give the counterpart of negation in Curry-Howard 
+    Correspondence that $\neg\ P$ is understood as a function $P\to\zero$.
+    To prove something is wrong, you prove that if this fact is true, 
+    then you can prove absurdity and thus everything. The recursor 
+    $\rec_\zero$ is the principle {\it ex falso quodlibet}.
+
+    \item The {\it boolean} type $\two:\universe$ is a type with exactly
+    two constructors $0_\two,1_\two:\two$. The induction principle is 
+    $$
+    \ind_\two:\prod_{C:\two\to\universe}C(0_\two)\to C(1_\two)\to\prod_{x:\two}C(x)
+    $$
+    $$
+        \ind_2(C,c_0,c_1,0_\two)\defn c_0
+    $$
+    $$
+        \ind_2(C,c_0,c_1,1_\two)\defn c_1
+    $$
+    Note this is not the boolean value of our language, but as a target.
+    In first order logic, we define the {\it correctness} of a sentence
+    by interpreting it to a boolean value (or more generally, a boolean
+    algebra (Chapter 2 of \cite{Curry-Howard})), but this is not the
+    (judgemental) correctness in our meta-language (like $\equiv,:$).
+    For example, we can define a relation $\name{leb}:\nat\to\nat\to\two$ 
+    (`less than or equal to in boolean') by pattern matching. (Please try
+    rewriting it with the recursor $\rec_\nat$.)
+    \eq {
+        \name{leb}(0, m) & \defn 1_\two \\
+        \name{leb}(\succn(n), 0) & \defn 0_\two \\
+        \name{leb}(\succn(n),\succn(m)) & \defn \name{leb}(n,m)
+    }
+    However, we can also define this relation as a new type.
+    Define $\name{le}: \nat\to\nat\to\universe$ (like the $\times:\universe
+    \to\universe\to\universe$ for product type can also be understood as a 
+    `function') with constructors $\name{le}_n(n): \name{le}(n, n)$ and
+    $\name{le}_S(n:\nat, m:\nat, H: \name{le}(n, m)): \name{le}(n,\succn(m))$.
+    (This is a dependent version of constructors. If you are not happy 
+    with it, look at the next section.)
+    You can try to prove\footnote{You can find this in the first volume of
+    \cite{SF}. I strongly recommend you not prove it with your pen but with
+    the help of a computer proof assistant.} 
+    $\Pi_{n,m:\nat}\name{le}(n,m)\to \name{leb}(n,m)=_\two 1_\two$.
+\end{enumerate}
+
+\section{Dependent Pair}
+
+Given type $A:\universe$, and a family $B:A\to\universe$, I want a relation
+between some $a: A$ and $p: B(x)$. Trivially, let me just compose them
+together with a tuple $(a, p)$. We call such a behavior {\it dependent 
+pair} or $\Sigma$-type written as $(a,p):\Sigma_{x:A}B(x)$ because this 
+looks like a product type while the type of the second element in the
+tuple {\it dependent} on the first element. Of course, the constructor
+is $(,)_{A,B:A\to\universe}: \Pi_{x:A}B(x)\to\Sigma_{y:A}B(y)$.
+When $B$ is constant, $\Sigma_{x:A}B\defn(A\times B)$. Similarly we can
+define $\pi_1:\Sigma_{x:A}B(x)\to A$ and 
+$\pi_2:\Pi_{(p: \Sigma_{x:A}B(x))}B(\pi_1(p))$. Such a definition coincides
+with the requirement for {\it existential quantifier} ($\exists$) in
+intuitionistic logic, i.e. if something exists, you must construct it.
+You can further make a group or at least a 
+$\name{Magma}\defn \Sigma_{A:\universe}(A\to A\to A)$ with it.
+The induction principle is
+$$
+    \ind_{\Sigma_{x:A}B(x)}:\prod_{C:(\Sigma_{x:A}B(x))\to\universe}
+    (\Pi_{a:A}\Pi_{b:B(a)}C((a, b)))\to
+    \prod_{p: \Sigma_{x:A}B(x)} C(p)
+$$
+$$
+    \ind_{\Sigma_{x:A}B(x)}(C,g,(a,b)) \defn g(a)(b).
+$$
+
+The name $\Sigma$ is related to the disjoint unions. For example,
+when $A\equiv \two$, we can define 
+$A+B\defn \Sigma_{x:\two}\rec_\two(\universe,A,B,x)$ with 
+$\inl(a)\defn(0_\two,a)$ and $\inr(b)\defn(1_\two,b)$. I'm not sure
+whether this is true or not, but it seems that we can treat $\Pi$-types
+and $\Sigma$-types as products and coproducts of indexed families of 
+types. I haven't found any material about how to categorize dependent
+types but as you may observe, there's a category of simply typed lambda
+calculus. 
+
+\section{Categroy of Simply Typed Lambda Calculus}
+We use the definitional or judgemental equality $=_\beta$ as an
+equivalence relation on the set of all $\lambda$-terms and make it
+into a category:
+
+\begin{itemize}[label={}]
+    \item objects: the types
+    \item arrows: If $c: A\to B$ is a $\lambda$-term without {\it free
+    variables} (so-called closed term), then $[c]$ is an arrow from
+    $A\to B$.
+    \item Identities: $1_A$ is $[\lambda x: A.x]$.
+    \item Compositions: If $[b]: A \to B$, $[c]: B\to C$, then
+    $[c]\circ [b] = [\lambda x. c(b(x))]$.
+\end{itemize}
+
+\begin{remark}
+    The equivalence relation defines a rule to `identity' different
+    proofs. For example\footnote{This example comes from \cite{Curry-Howard}}
+    $$
+        \infer{\proves\lambda x:\phi.\lambda y:\phi.x:\phi\to\phi\to\phi}
+        {
+            \infer{x:\phi\proves\lambda y:\phi.x:\phi\to\phi}{
+                x:\phi,y:\phi\proves x:\phi
+            }
+        }
+    $$
+    and
+    $$
+        \infer{\proves\lambda x:\phi.\lambda y:\phi.y:\phi\to\phi\to\phi}
+        {
+            \infer{x:\phi\proves\lambda y:\phi.y:\phi\to\phi}{
+                x:\phi,y:\phi\proves y:\phi
+            }
+        }
+    $$
+    are two different proofs ($\lambda x. \lambda y. x\neq_\beta
+    \lambda x.\lambda y. y$) of
+    $$
+        \infer{\proves\phi\to\phi\to\phi}{
+            \infer{\phi\proves\phi\to\phi}{\phi\proves\phi}.
+        }
+    $$
+\end{remark}
+
+Such a category is a so-called CCC
+({\it {\bf C}atesian {\bf C}losed {\bf C}ategory}).
+The products and exponentials are obvious. Tranditionally we would
+like to extend the syntax of types with two more constants $\top$($\one$)
+and $\bot$($\zero$). Thus we have terminals and initials in this category. 
+
+Given a $\lambda$-calculus $\mathcal{L}$ (different variable sets)
+and a CCC $\mathbf{C}$, we define a {\it model} of $\mathcal{L}$ in
+$\mathbf{C}$ as an assigement
+\newcommand{\assign}[1]{\llbracket#1\rrbracket}
+\eq {
+    X\ \text{type} &\mapsto \assign{X}\ \text{object} \\
+    b: A\to B\ \text{term} &\mapsto \assign{b}: \assign{A}\to\assign{B}\ \text{arrow}
+}
+such that
+$$
+\mathcal{L}\proves [a]=_\beta[b]: A\to B\text{ implies }
+\assign{a}=\assign{b}: \assign{A}\to\assign{B}
+$$
+
+In \cite{cat-awodey}, the author mentioned that since topoi are
+CCCs, it's natural to describe them with type theory. Combining
+this with the first-order language, the subobject classifier provides
+a natural interpretatioon of higher-order logic by exponentials of
+the classifier. This part is vaguely described and is picked from the
+book \cite{Introduction-to-higher-order-categorical-logic}. I think 
+later I will dive into that book to fully understand this. 
