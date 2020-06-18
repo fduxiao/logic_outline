@@ -159,9 +159,10 @@ Church numeral}. Try to prove the term $A_+=\lambda x.\lambda y.\lambda s
 $A_+\ c_n\ c_m=_\beta c_{m+n}$. Consider what are the multiplication and 
 exponent. The last example is only available in untyped lambda calculus,
 the fixed point combinator. Compared with the traditional 
-$$\mathbf{Y} = \lambda f.(\lambda x.f\ (x\ x))\ \lambda x.f\ (x\ x)$$
+\newcommand{\Ycomb}{\mathbf{Y}}
+$$\Ycomb = \lambda f.(\lambda x.f\ (x\ x))\ \lambda x.f\ (x\ x)$$
 such that for any $\lambda$-term $F$, 
-$F\ (\mathbf{Y})=_\beta \mathbf{Y}\ F$, the exercise in chapter 1 of 
+$F\ (\Ycomb)=_\beta \Ycomb\ F$, the exercise in chapter 1 of 
 \cite{Curry-Howard} is more interesting. Let
 $$
 \begin{array}{lll}
@@ -318,7 +319,10 @@ transformation}, which is another interesting theoretical thing.)
 \end{caveat}
 
 The above is the counterpart of propositional logic, which we often
-refer to as {\it simply typed $\lambda$-calculus}.
+refer to as {\it simply typed $\lambda$-calculus}. When defining
+$\lambda$-terms which represents some kind of computation or logic,
+we do not define the computation process or correctness directly, but 
+its structure or the evidence that it is sound. 
 
 \section{The Usage of Meta Language}
 Though we have two things, $\lambda$-terms and types, as in set theory,
@@ -347,22 +351,25 @@ we use for mathematics (judgemental equality). In other chapters, I will
 still use `$=$'. 
 
 Now the only things we have to handle is the relation `$:$' and the 
-judgemental equality $\equiv$. And I will roughtly describe how I should
-introduce a new type. To define the {\it function type} `$\to$', we first 
-define the syntax for the type set, i.e., if $A$ and $B$ are type, then 
-so is $A\to B$. This is called the {\bf formation rule} for $\to$. Then 
-we have to show when this type is {\it inhabited}, i.e. to define an 
-element $f$ of this type $f:A\to B$, I have to use $\lambda$-abstraction. 
-This extends the syntax of $\lambda$-term. Such a syntax is called the 
-{\bf constructor} of a new type (Another example is the comma 
-$(,): A\to B\to A\times B$. Though I write it as a function, it is not 
-defined as a function, but a new syntax. The abstraction can never be 
-described by a simpler term. Actually you can even introduce more syntax 
-like the abstraction, e.g. the $\lambda\mu$-calculus 
-\cite{lambda-mu-calculus}.) We also define the {\bf computation rule} 
-$(\lambda x. M)\ N \defn M[x:=M]$ showing the {\bf elimination rule} 
-for the function type. And we define the $\alpha$-conversion to identify 
-two $\lambda$-terms, which is called the {\bf uniqueness rule}.
+judgemental equality $\equiv$, and to define the {\it function type} 
+`$\to$', we first define the syntax for the type set, i.e., if $A$ and 
+$B$ are type, then so is $A\to B$. This is called the {\bf formation 
+rule} for $\to$. Then we have to show when this type is {\it inhabited}, 
+i.e. to define an element $f$ of this type $f:A\to B$, I have to use 
+$\lambda$-abstraction. This extends the syntax of $\lambda$-term. 
+Such a syntax is called the {\bf constructor} of a new type 
+(Another example is the comma $(,): A\to B\to A\times B$. Though I write 
+it as a function, it is not defined as a function, but a new syntax. 
+The formation rule is like you can always form a new formula but you
+have to first give how to prove such a new formula by constructors and
+only use constructors to `prove' this formula. The abstraction can never 
+be described by a simpler term. Actually you can even introduce more 
+syntax like the abstraction, e.g. the $\lambda\mu$-calculus 
+\cite{lambda-mu-calculus}.) We also define the {\bf computation rule}
+($\to_\beta$) $(\lambda x. M)\ N \defn M[x:=M]$ showing the 
+{\bf elimination rule} for the function type. And we define the 
+$\alpha$-conversion to identify two $\lambda$-terms, which is called 
+the {\bf uniqueness rule}.
 
 \section{The Universe of Type}
 \label{type-universe}
@@ -655,15 +662,19 @@ I reform the target as
 $$
 \infer{\succn(n) + 0 =_\nat \succn(n)}{n:\nat & n+0=_\nat n}
 $$
-According to the computation rule 
+Again by the computation rule, 
 $\succn(n) + 0 =_\nat \succn(n)\defn \succn(n+0)=_\nat\succn(n)$. 
-Now let's admit the leibniz rule 
-$$
+Now let's admit the leibniz rules. (though I am reluctant to do this, 
+but it seems that without equality I could hardly prove anything. 
+This will be introduced later.)
+
+\begin{definition}
+    \label{leibniz}
+    $$
     \name{leibniz}: \prod_{A,B:\universe}\prod_{f:A\to B}\prod_{x,y:A}
         x=_Ay\to f(x)=_Bf(y)
-$$ 
-(though I am reluctant to do, but it seems that without equality I could
-hardly prove anything. This will be introduced later.)
+    $$ 
+\end{definition}
 Clearly the type $\Pi_{n:\nat}C(n)\to C(\succn(n))$ can be inhabited by
 $$
     \lambda (n:\nat).\lambda (eq:n+0=_\nat n). \name{leibniz}
