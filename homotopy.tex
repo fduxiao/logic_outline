@@ -137,6 +137,7 @@ equality}. Now I follow the convention in \cite{homotopy-type-theory} still
 calling it {\it identity type}.
 
 \begin{definition}
+    \label{identity-type}
     (Identity Type) The formation rule is 
     $\Id: \Pi_{A:\universe}A\to A\to\universe$ or $\Id_A: A\to A\to \universe$ 
     (note that $\to$ and $\times: \universe\to\universe$ are also 
@@ -146,13 +147,16 @@ calling it {\it identity type}.
 \end{definition}
 
 As usual, the induction principle is
-$$
+
+\begin{equation}
+    \label{ind_id}
     \ind_{=_A}:\prod_{(C:\prod_{(x,y:A)}(x=_A y)\to\universe)}
     (\prod_{x:A}C(x,x,\refl_x))\to\prod_{x,y:A}\prod_{p:x=_A y}C(x,y,p)
-$$
+\end{equation}
+
 with computation rule
 $$
-    \ind_{=_A}(C,c,x,x,refl_x)\defn c(x).
+    \ind_{=_A}(C,c,x,x,\refl_x)\defn c(x).
 $$
 This rule, the {\it path induction}, is traditionally called $J$ and we 
 can derive the {\it leibniz rule} (\autoref{leibniz}) from it. For 
@@ -166,26 +170,29 @@ $$
 $$
     \ind'_{=_A}(a, C, c, a,\refl_a) \defn c.
 $$
+
 But be careful that we define the constructor for the space 
 $\sum_{x,y:A}x=_A y$ (or $\sum_{y:A}(a=y)$ as for the based induction).
-We may prove that $(x,y,p)=_{\sum_{(x,y:A)}(x=y)}(x,x,\refl_x)$, but
+We may prove that $$(x,y,p)=_{\sum_{(x,y:A)}(x=y)}(x,x,\refl_x),$$ but
 this does not mean that $\prod_{p:x=_A x}p=_{x=_Ax}\refl_x$ (because
 we cannot even apply the induction rule), or more generally the {\it
 Uniquess of Identity Proofs} (UIP).
 \newcommand{\uip}{\name{uip}}
-$$
-\uip: \forall (A: \universe), (x,y:A), (p,q:x=_A y),p=_{x=_A y}q
-$$
+\begin{equation}
+    \label{uip}
+    \uip: \forall (A: \universe), (x,y:A), (p,q:x=_A y),p=_{x=_A y}q
+\end{equation}
 (It's quite silly to write a lot of $\Pi$s, especially when $\Pi$ exists
 in the subscription, so I write $\forall$ instead.)
 Note we that cannot define this function by pattern match 
 $\uip(A,x,x,\refl,\refl\defn\refl$\footnote{In programming language
 idris, this is acceptable.} because we potentially used an
 equivalent $K$ axiom \cite{pattern-matching-without-K}
-$$
+\begin{equation}
+    \label{K-axiom}
     K: \forall (A:\universe), (a:A), (P: a=a\to\universe),
-    P(\refl)\to\forall (loop: a = a), P(loop).
-$$
+    P(\refl)\to\forall (l: a = a), P(l).
+\end{equation}
 
 It seems that there's a general way to give `sound' induction rules.
 In fact, there's a $W$-type described in chapter 5 of \cite{homotopy-type-theory},
@@ -228,10 +235,198 @@ not from the topology and continuity (defining the hom-sets directly).
 To call $p:a=_Ab$ a path, we have to first prove it has an `inverse' and
 we can concatenate paths.
 
+\begin{lemma}
+    For $x,y:A$ and $p: x=y$, we have $p\inv: y=x$, i.e.
+    a function $(\cdot)\inv: x=y\to y=x$ such that $\refl_x\inv=
+    \refl_x$. $p\inv$ is the inverse of $p$.
+\end{lemma}
+\begin{proof}
+    Let $D(x,y,p)\defn(y=x)$, $D:\prod_(x,y:A)(x=y)\to\universe$ and
+    $d\defn(\lambda x.\refl_x):\prod D(x,x,\refl_x)$. Applying the
+    induction principle \eqref{ind_id}, we get 
+    $p\defn\ind_{=_A}(D,d,x,y,p):(y=x)$. According to the computation
+    rule, $\refl_x\inv\defn \ind_{=_A}(D,d,x,x,\refl_x)\equiv d(x)\equiv
+    \refl_x$.
+\end{proof}
+We can also make this proof shorter with {\it pattern matching}.
+\begin{proof}
+    By induction, it suffices to assume that $x\equiv y$ and $p$ is
+    $\refl_x:x=x$. Clearly we can define $p\inv\defn \refl_x:x=x$, (which
+    is exactly the computation rule).
+\end{proof}
 
+\newcommand{\sqcdot}{\mathbin{\vcenter{\hbox{\rule{.3ex}{.3ex}}}}}
+\newcommand{\concat}{\sqcdot}
+Similarly we can prove the following concatenation of paths.  
+\begin{lemma}
+    For $x,y,z: A$, $(\concat):(x=y)\to(y=z)\to(x=z)$ such that
+    $\refl_x\concat \refl_x\equiv\refl_x$. 
+\end{lemma}
+\begin{proof}
+    You can choose to define a $D(x,y,p)\defn\prod_{z:A}\prod_{q:y=z}(x=z)$
+    and so on to invoke the induction principle \eqref{ind_id}, but it is
+    a bit too tedious (since this time we need to invoke it twice).
+    Instead, let's use pattern matching. By induction on $p$, it suffices 
+    to assume $x\equiv y$ and $p\equiv\refl_x$. Now our target is
+    $(x=x)\to(x=z)\to(x=z)$. Then let's continue by induction on $q$.
+    Thus the target is $(x=x)\to(x=x)\to(x=x)$. We then define the last
+    term to be $\refl_x$. 
+\end{proof}
+You may argue that why not apply id to $(x=x)\to(x=z)\to(x=z)$. The 
+difference is that in the proof I presented, the computation rule is 
+$\refl_x\concat\refl_x\equiv\refl_x$, while the other proof gives 
+$\refl\concat q\equiv q$. Similarly you can define the computation
+rule to be $p\concat\refl=p$. That is, as said in 
+\cite{homotopy-type-theory}, only a stylishtic choice. The other two
+should be derived (propositionally) from any of the three computation 
+rules and we can have more results.
+\begin{lemma}
+    Suppose $x,y,z,w:A$ and $p:x=y$, $q:y=z$, $r:z=w$. Then
+    \begin{enumerate}
+        \item $p=p\concat\refl$, and $p=\refl\concat p$.
+        \item $p\inv\concat p=\refl$, $p\concat p\inv=\refl$.
+        \item ${(p\inv)}\inv=p$.
+        \item $p\concat(q\concat r) = (p\concat q)\concat r$
+    \end{enumerate}
+\end{lemma}
 
-It seems that the book of Homotopy Type Theory \cite{homotopy-type-theory} 
+Analogous to the fundamental group, we can define the {\it loop space} 
+$$\Omega(A, a)\defn a=_Aa$$ for a type $A$ and $a: A$. More precisely,
+
+\newcommand{\pointed}{_\bullet}
+\begin{definition}
+    We call $(A, a)$ a {\it pointed type} for $A:\universe$, $a:A$.
+    $a$ is called the {\it basepoint} ane the pair of type 
+    $\universe\pointed\defn\sum_{(A:\universe)A}$ is the type of pointed 
+    types in universe $\universe$.
+\end{definition}
+
+\begin{definition}
+    Given any pair $(A, a)$, we define the {\it loop space} as 
+    $$ \Omega(A,a)\defn ((a=_A a),\refl_a).$$
+    For $n:\nat$, we define the {\it$n$-fold iterated loop space} as
+    $$\Omega^0(A,a)\defn(A,a)$$
+    $$\Omega^{n+1}(A,a)\defn\Omega^n(\Omega(A, a))$$.
+\end{definition}
+
+For example, 
+$$
+    \Omega^2(A,a)\equiv\Omega(\Omega((A,a)))\equiv\Omega(a=_Aa,\refl_a)
+    \equiv(\refl_a=_{a=_Aa}\refl_a, \refl_{\refl_a}).
+$$
+
+Just like ``{\it Groups in the category of groups are commutative}''
+\cite{cat-awodey} or higher homotopy groups are commutative, we have
+the Eckmann-Hilton theorem in type theory namely that the concatenation of 
+paths $\Omega^2(A,a)\times\Omega^2(A,a)\to\Omega^2(A,a)$ is commutative.
+
+The behavior of the type theory quite resembles homotopy in algebraic
+topology. Let me give more notations.
+
+In set theory, two functions $f,g: A\to B$ are equal iff 
+$f(x)=g(x)\forall x\in A$ as ``relations''. In type theory this is wrong
+because there's no evidence that $f: A\to B=g: A\to B$ ensures they are
+defined with the same lambda term (with respect to $=_\beta$). For example 
+$\lambda x:\nat. x+0$ and $\lambda x:\nat. x$ are definitionally different.
+(note that $x+0=x$ is proved not $=\beta$). As proved before, we can
+prove $\prod_{n:\nat}(\lambda x.x+0)\ n=(\lambda x.x)\ n$. You can even
+verify this in pure $\lambda$-calculus (recall that natural numbers are
+represented by church numerals). 
+The axiom\footnote{This is not included by the theroy presented so far.}
+$(\Pi_{x:A}f(x)=g(x))\to f = g$ is known as {\it function extensionality},
+which will trivialize the intensional homotopy structure of the theory.
+Thus in HoTT, this is viewed as a homotopy between $f$ and $g$:
+\begin{definition}
+    For $f,g:\Pi_{x:A}P(x)$, the homotopy relation between $f$ and $g$
+    is a dependent function
+    $$
+        f\sim g\defn \prod_{x:A}f(x)=g(x)
+    $$
+    ($f$ is homotopic to $g$).
+\end{definition}
+
+\newcommand{\isequiv}{\name{isequiv}}
+Similarly, we can define the homotopy equivalence $\simeq$.
+\begin{definition}
+    If $f:A\to B$ is a function, we say that $f$ is an equivalence provided
+    $\exists g:B\to A,f\circ g\sim \id_B$ and 
+    $\exists h:B\to A(h\circ f\sim \id_A)$, i.e., 
+    $$
+        \isequiv(f)\defn(\sum_{g:B\to A}f\circ g\sim \id_B)\times
+        (\sum_{h:B\to A}h\circ f\sim \id_A)
+    $$
+    And we can define
+    $$
+        A\simeq B\defn\sum_{f:A\to B}\isequiv(f)
+    $$
+\end{definition}
+
+Note we donnot define it as $\sum_{g:B\to A}(f\circ g\sim id_B)\times
+(g\circ f\sim \id_A)$, where $g$ is called {\it quasi-inverse} of $f$.
+One problem is that the inhabitants of that type is not unique 
+(propositionally), but it can be shown that they are `equivalent' (two 
+types imply each other), whose proof is similar to that in algebraic 
+topology (a problem in the mid-term last semester). 
+
+Now think about the path $=_A$ in the space $\universe$. We haven't 
+inspected any further information about the universe $\universe$.
+With the notation of equivalence, Voevodsky gave an extension of the
+equality as an axiom (called {\it Univalence Axiom})
+\newcommand{\univalence}{\name{univalence}}
+$$
+    \univalence: (A=B)\simeq(A\simeq B).
+$$
+You can easily find the canonical function $\Id_\universe(A,B)\to(A\simeq B)$. 
+The univalence axiom extends it into an equivalence. It is said that this
+axiom raises many consequences ``{\it naturally, simply and compellingly}''
+\cite{homotopy-type-theory}. 
+
+This homotopical interpretation is what I'm struggling with. I still
+feel it a bit difficult for me to accept the unavailability of $\uip$
+\eqref{uip} and I am trying to understand it as I understand `A implies B
+is defined as not A or B'. Also, I don't feel quite happy with the
+$\infty$-groupoid part, because I have never meet with such a higher
+order category before. It seems that the book of HoTT\cite{homotopy-type-theory} 
 wants to interpret the theory syntactically, because it does not require a 
 profound comprehension about what is groupoid. Rather, it implies that the
-homotopy type theory is a better language for that purpose. For example
-when define a
+homotopy type theory is a better language for this purpose. 
+
+For example when defining a homotopical circle $\sphere$, we can define 
+the it as a base point and a loop (path, i.e. the equality) between the 
+basepoint
+\newcommand{\base}{\name{base}}
+\newcommand{\nloop}{\name{loop}}
+$$
+    \sphere\defn\begin{cases}
+        \base: \sphere \\
+        \nloop: \base=\base \\
+    \end{cases}.
+$$
+This kind of style to define a new type (inductively) is called higher
+inductive type (HIT) (chapter 6 of \cite{homotopy-type-theory}).
+To calculate its fundamental group, we find the universal covering space 
+of it, namely a family $\name{cov}:\sphere\to\universe$. That is to
+find an $A: \universe$ and an equality $A=_\universe A$. Letting $A$
+be $\integer$, we define $\name{cov}(\base)\defn\integer$ and 
+$\name{conv}(\nloop):\base=\base$. According to the univalence axioms,
+it suffices to define an equivalence $\integer\simeq\integer$. In fact
+we know that $\succn: \integer\to\integer$ is clearly what we want.
+
+The space $\sum_{x:\sphere}\name{cov}(x)$ forms a covering space of
+the homotopical sphere $\sphere$. For any path $p:x=_\sphere y$ in A,
+we have a {\it transport} $p_\ast:\name{cov}(x)\to \name{cov}(y)$ and
+we can lift the path to $\sum_{x:\sphere}\name{cov}(x)$ with
+\newcommand{\lift}{\name{lift}}
+$\lift(u,p):(x,u)=(y,p_\ast(u))$, where $u: \name{cov}(x)$ is any
+start point in the covering space. Thus we define the $\name{wind}$
+function $\name{wind}: \Omega(\sphere,\base)\to\integer$ such that
+for any $p:\base=\base$, $\name{wind}(p)=p_\ast(0)$, which is the
+inverse of $n\mapsto \nloop^n: \integer\to\Omega(\sphere)$.
+
+It's quite natural to define the circle $\sphere$ with this homotopy
+interpretation. I think it's easier to describe the higher category,
+e.g. the fundamental $\infty$-groupoid with the language of HoTT. 
+Besides, it seems that this language has some other applications.
+In talk given by Andr\'e Joyal at MIT \cite{joyal2014categorical}, 
+it is suggested that the theory can be further applied to higher topos 
+theory or higher category theory.
