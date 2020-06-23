@@ -1,0 +1,163 @@
+\chapter{Classical Logic}
+\label{classical-logic}
+Let's first discuss an interesting problem (the L\"{o}wenheim–Skolem theorem).
+Suppose $f:U\times U\to U$ and $g:U\to U$ are two functions. A set
+$K\subseteq U$ is called {\it closed} if $f(K,K)\subseteq K$ and 
+$g(K)\subseteq K$. Given an $E\subseteq U$, the closure $\bar{E}$ is
+the smallest closed set containing $E$, i.e. $E\subseteq \bar{E}$ and
+$\forall K\subseteq U$, if $K$ is closed and $E\subseteq K$, then $\bar{E}
+\subseteq K$. Define 
+$$
+    E^\ast = \bigcap\{F\subseteq U\mid E\subseteq F\text{ and $F$ is closed}\}.
+$$
+
+Define $C_0=E$, and when $C_n$ is defined, we define $C_{n+1}$ as
+$$
+    C_{n+1} = C_n\cup f(C_n, C_n)\cup g(C_n)
+$$
+and let
+$$
+    E_\ast = \bigcup_{n\in\nat}C_n
+$$
+Clearly $\bar{E}=E^\ast=E_\ast$.
+
+This example is how recursion works in set theory, or the explanation of
+{\it free} in set theory. Actually it means some initial algebra 
+\cite{homotopy-type-theory} and is related to monad 
+\cite{reddy1995monads,jacobs1997tutorial}.
+
+\section{Well Formed Formula(WFF)}
+
+Let $V$ be a set of {\it propositional variables}. The members of this
+set are denoted as capital letters $A,B,C,...$. For a {\it formula} as
+the concept defined below, I use lowercase Greek letters $\phi,\psi,\theta$
+or lowercase English letter $a,b,c$. For example $a\to b$ can be 
+$(A\to C)\to(\neg B)$ or $A\to (B\to C)$, but $A\to B$ is just $A\to B$.
+
+A {\bf well formed formula}
+is a member of the recursively defined set
+\newcommand{\formula}{\mathscr{F}}
+$$
+    \formula ::= 
+        V 
+        \mid \formula \to \formula
+        \mid \neg \formula
+$$
+In some book, only $\formula \vee \formula$ and $\neg \formula$ are defined
+and $A \to B$ is alias to $\neg A \vee B$. This is merely a style difference.
+More logical conjunctions means more syntaxes in the deduction system. 
+
+\section{Semantics of WFF}
+Let $\two=\{\zero,\one\}$. An assignment is a function $v: V\to \two$, and
+its extension $\bar{v}:\formula \to \two$ is a function such that
+$\bar{v}(A)=v(A)$, $\bar{v}(\neg a)=1 - \bar{v}(a)$ and 
+$\bar{v}(a\to b)=\max\{1-\bar{v}(a),\bar{v}(b)\}$.
+Thus each formula or logical conjunction 
+can be viewed as a function $\two^n\to\two$. You can
+also define other logical conjunctions such as $\bar{v}(a\wedge b)=
+\min\{\bar{v}(a),\bar{v}(b)\}$, $\bar{v}(a\vee b)=
+\max\{\bar{v}(a),\bar{v}(b)\}$. You may notice that the implication 
+$a\to b$ is identical to not $a$ or $b$. If you interpret $\one$ as
+true and $\zero$ as false, this means an implication is true iff
+the antecedent is wrong or the consequent is correct. It's very
+weired for beginners, but think about this example  
+``The Chinese football team has never lost a point in the World Cup
+in the past decade''. (This year is 2020.) It's true because they've
+never entered world cup. The equivalence of $a\to b$ and $\neg a\vee b$
+is equivalent to the {\bf Law of Excluded Middle} (LEM) $p\vee\neg p$.
+This makes a classical deduction system complete, but is not true
+for intuitionistic logic. 
+
+Given a set of logical conjunctions, if any
+function $\two^n\to\two$ can be represented by a formula with only
+logical conjunctions in that set, then the set is called {\it
+functionally complete}. Clearly $\{\neg,\to\}$ is functionally
+complete.
+
+\section{Deduction system}
+Hilbert once developed a strict syntax about what is a proof. I
+give the variation of Mendelssohn. Let $\Gamma$ be a set of wffs.
+A proof from $\Gamma$ to $\phi$ is a finite sequence $\phi_n$ of
+wffs with the last one $\phi$ such that each $\phi_n$ comes from
+one of the following situations.
+
+\begin{enumerate}
+    \item $\phi_n\in\Gamma$
+    \item $\phi_n$ has one of the following forms 
+        \begin{enumerate}
+            \item $a\to (b\to a)$ (Affirmation of the consequent)
+            \item $(a\to(b\to c))\to((a\to b)\to(a\to c))$ (Distribution of implication)
+            \item $(\neg a\to\neg b)\to((\neg a\to b)\to a)$ (Proof by contradiction)
+        \end{enumerate}
+    \item There exists $i,j<n$ and $\phi_j=\phi_i\to\phi_n$ (MP, Modus Ponens)
+\end{enumerate}
+
+If a proof from $\Gamma$ to $\phi$ exists, we write $\Gamma\proves\phi$.
+If $\Gamma=\emptyset$, we write $\proves\phi$
+
+For example, the following is a proof sequence towards $p\to p$.
+\begin{enumerate}
+    \item $p\to((p\to p)\to p)$ (2.a)
+    \item $(p\to((p\to p)\to p))\to((p\to(p\to p))\to(p\to p))$ (2.b)
+    \item $(p\to(p\to p))\to(p\to p)$ (1,2 MP)
+    \item $p\to(p\to p)$ (2.a)
+    \item $p\to p$ (3,4 MP)
+\end{enumerate}
+
+\section{Soundness and Completeness}
+An assignment $v:V\to \two$ satisfies $\Gamma$ if for any $\phi\in\Gamma$,
+$\bar{v}(\phi)=\one$. For a wff $\phi$, if for any assignment 
+$v:V\to\two$ satisfiying $\Gamma$, $\bar{v}(\phi)=\one$, then $\phi$ is
+called the semantic consequent of $\Gamma$, written as $\Gamma\models\phi$.
+
+\begin{theorem}
+    The deduction system is sound, i.e., $\Gamma\proves\phi$ implies
+    $\Gamma\models\phi$. 
+\end{theorem}
+
+\begin{theorem}
+    The deduction system is complete, i.e., $\Gamma\models\phi$ implies
+    $\Gamma\proves\phi$. 
+\end{theorem}
+
+These two relations are the core concern of a logic system. The soundness
+is very easy to verify, but the proof of completeness is often tricky.
+The soundness ensures each proof is meaningful and the completeness means
+that you can always find a `proof' as defined above. This can be extended
+to a ``first order logic''. For example, we can write a pure syntactic
+proof of ``groups of order prime sqaure are abelian'', but a semantic
+proof is more convenient. The semantic part, as a first order part in
+the meta language of meta language, is complete. Thus the completeness
+ensures us to find a proof (where a group is defined as a set). 
+
+Here's a last exercise, you may want to know why we need these 3
+logical axioms. Though they ensure the completeness, are they all
+necessary? For example, can one derive 
+$(\neg a\to\neg b)\to((\neg a\to b)\to a)$ from the other two axioms? 
+The answer is negative. {\it Hint}: think about the triple value logic
+below. 
+
+\begin{center}
+    \begin{tabular}{c|c}
+        $\neg$ &  $a$ \\
+        \hline
+        0 & 0 \\
+        0 & 1 \\
+        0 & 2 \\
+    \end{tabular}
+
+    \begin{tabular}{c | c | c}
+         $a$ &   $\to$   & $b$ \\
+         \hline
+          0  &   0   &  0  \\
+          0  &   0   &  1  \\
+          0  &   2   &  2  \\
+          1  &   0   &  0  \\
+          1  &   0   &  1  \\
+          1  &   2   &  2  \\
+          2  &   0   &  0  \\
+          2  &   0   &  1  \\
+          2  &   0   &  2  \\
+    \end{tabular}
+\end{center}
+

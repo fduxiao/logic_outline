@@ -112,23 +112,28 @@ language.} language for group theory, i.e. every set operation (only the
 equality comparison and binary operation) is mapped to an operation in 
 group. 
 
-To summary, we hope a self reflexive and representative language. The
-first order language together with sets (models) as its semantics is
-representative but it is not good at self referring (You have to lift
-the order of the language and treat it separately). As a substitution, 
-type theory embrace these benefits. The type theory 
-\cite{intuitionistic-type-theory} chooses {\it type} as its formal 
-language, which, just as the model (structured set) theory chooses set 
-theory for its semantics, can choose {\it Topos} as 
-its semantics \cite{Introduction-to-higher-order-categorical-logic,
-categorical-logic-and-type-theory}. Later the Homotopy Type Theory(HoTT)
-\cite{homotopy-type-theory,univalence} also gives another 
-geometric interpretation for type theory. The benefit of type
-theory is its intrinsic computational nature, and the coincidence of the
-computation rule and the inference rule (namely the Curry Howard 
-correspondence). Thus inference rules can be verify by a computer, 
-a proof is constructive, and the type hints a mathematician about 
-his/her goal\cite{coq}.
+To summary, we hope a self reflexive and representative language to
+help us efficiently produce proofs. The first order language together 
+with sets (models) as its semantics is representative but it is not good 
+at self referring (You have to lift the order of the language and treat 
+it separately). In programming, once the computation process (proofs) can 
+be efficiently represented by data structures (objects like sets)\footnote{
+    For example the {\bf lisp} language family based directly on lambda
+    calculus uses a list-like form as its only syntax, thus making it
+    convenient to generate code.
+}, we can use the computational feature at current session to generate
+code and then run the result. In logic, you may want to define a function
+to generate proof, which means we don't prove inside the deduction system
+but prove the existence of the construction of a proof in the deduction
+system. As a substitution, type theory embraces these benefits. 
+The type theory contains two inherent layers, a layer of object and
+another of reduction. The latter coincides with the inference rule,
+namely the Curry-Howard correspondence \cite{Curry-Howard,
+intuitionistic-type-theory}. It's very easy to represent a proof as an
+object (function types) and the {\it $\beta$-reduction} is the inference
+rule {\it modus ponens}. In fact, it can also be used as a better language
+for homotopy theory \cite{homotopy-type-theory} or topos theory
+\cite{Introduction-to-higher-order-categorical-logic,categorical-logic-and-type-theory}
 
 The computational explanation for logic also raises other problems.
 In general we can not compare two proofs. One can always write down
@@ -136,7 +141,15 @@ redundant sentences amidst a proof, as is a redundant calculation
 abstraction. To find the shortest form of a calculation is known as
 the normalization problem in typed lambda calculus\cite{Curry-Howard}.
 Again, the Curry Howard correspondence provides us a way to compare two
-proofs. The meta-programming techniques, i.e generating some parts of
+proofs. The different possibilities of a proof towards the same proposition
+gives rise to the intensional structure of type theory (if you admit a
+term of some type is a proof). I mainly develop this part in 
+\autoref{type-theory} and \autoref{HoTT}. A simple version of the logic
+(as you may have observed, this kind of logic is certainly not the
+tradtional one, but the intuitionistic logic) isomorphic to the type
+theory is described in \autoref{intuitionistic-logic}.
+
+The meta-programming techniques, i.e generating some parts of
 the proof from the other, can also be applied to proving. A quick example
 is quantification elimination, which provides an algorithm to transfer
 each proof of a quantification-free formula to an equivalent one with
@@ -144,6 +157,8 @@ quantifications under certain circumstances. Haskell
 turns its language into a category and uses monad to represent
 complicated computation process 
 \cite{the-essence-of-functional-programming}. 
-In \autoref{intuitionistic-logic},
-I will give a monadic proof for Glivenko's theorem, and make use of
-it as a monad in \autoref{monad}. 
+In \autoref{intuitionistic-logic}, I give the description of Glivenko's 
+theorm and prove it in a monadic style. The concept originated 
+in category theory (\autoref{monad}) and is used widely in programming 
+\autoref{monad-examples}. Surprisingly, the same style can be applied to 
+a proof in intuitionistic logic.
