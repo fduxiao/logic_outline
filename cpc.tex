@@ -30,13 +30,13 @@ This example is how recursion works in set theory, or the explanation of
 
 Let $V$ be a set of {\it propositional variables}. The members of this
 set are denoted as capital letters $A,B,C,...$. For a {\it formula} as
-the concept defined below, I use lowercase Greek letters $\phi,\psi,\theta$
+the concept defined below, I use lowercase Greek letters $\varphi,\psi,\theta$
 or lowercase English letter $a,b,c$. For example $a\to b$ can be 
 $(A\to C)\to(\neg B)$ or $A\to (B\to C)$, but $A\to B$ is just $A\to B$.
 
 A {\bf well formed formula}
 is a member of the recursively defined set
-\newcommand{\formula}{\mathscr{F}}
+
 $$
     \formula ::= 
         V 
@@ -75,26 +75,26 @@ functionally complete}. Clearly $\{\neg,\to\}$ is functionally
 complete.
 
 \section{Deduction system}
+\label{Mendelssohn-system}
 Hilbert once developed a strict syntax about what is a proof. I
 give the variation of Mendelssohn. Let $\Gamma$ be a set of wffs.
-A proof from $\Gamma$ to $\phi$ is a finite sequence $\phi_n$ of
-wffs with the last one $\phi$ such that each $\phi_n$ comes from
+A proof from $\Gamma$ to $\varphi$ is a finite sequence $\varphi_n$ of
+wffs with the last one $\varphi$ such that each $\varphi_n$ comes from
 one of the following situations.
 
 \begin{enumerate}
-    \item $\phi_n\in\Gamma$
-    \item $\phi_n$ has one of the following forms 
+    \item $\varphi_n\in\Gamma$
+    \item $\varphi_n$ has one of the following forms 
         \begin{enumerate}
             \item $a\to (b\to a)$ (Affirmation of the consequent)
             \item $(a\to(b\to c))\to((a\to b)\to(a\to c))$ (Distribution of implication)
             \item $(\neg a\to\neg b)\to((\neg a\to b)\to a)$ (Proof by contradiction)
         \end{enumerate}
-    \item There exists $i,j<n$ and $\phi_j=\phi_i\to\phi_n$ (MP, Modus Ponens)
+    \item There exists $i,j<n$ and $\varphi_j=\varphi_i\to\varphi_n$ (MP, Modus Ponens)
 \end{enumerate}
 
-If a proof from $\Gamma$ to $\phi$ exists, we write $\Gamma\proves\phi$.
-If $\Gamma=\emptyset$, we write $\proves\phi$
-
+If a proof from $\Gamma$ to $\varphi$ exists, we write $\Gamma\proves\varphi$.
+If $\Gamma=\emptyset$, we write $\proves\varphi$. 
 For example, the following is a proof sequence towards $p\to p$.
 \begin{enumerate}
     \item $p\to((p\to p)\to p)$ (2.a)
@@ -104,20 +104,56 @@ For example, the following is a proof sequence towards $p\to p$.
     \item $p\to p$ (3,4 MP)
 \end{enumerate}
 
+\begin{theorem}
+    \label{deduction-theorem} (Deduction Theorem)
+    $\Gamma,a\proves b$ iff $\Gamma\proves a\to b$.
+\end{theorem}
+\begin{proof}
+    Clearly if $\Gamma\proves a\to b$, then $\Gamma,a\proves a\to b$ and
+    also we have $\Gamma,a\proves a$. Using MP, we have $\Gamma,a\proves b$.
+
+    Suppose conversely $\Gamma,a\proves b$. We prove $\Gamma\proves a\to b$
+    by induction on the proof sequence. Suppose $\varphi_1,\cdots,\varphi_n$
+    is a proof of $b$ from $\Gamma\cup\{a\}$, i.e. $\varphi_n=b$.
+    When $n=1$, then $b$ is obtained by
+    \begin{case}
+        $b\in\Gamma\cup\{a\}$. \\
+        If $b\in\Gamma$, then $\Gamma\proves b$ and 
+        $\Gamma\proves b\to a$. This implies $\Gamma\proves a\to b$ \\
+        If $b=a$, then certainly $\Gamma\proves a\to a$
+    \end{case}
+    
+    \begin{case}
+        $b$ is a logical axiom. Thus $\Gamma\proves b$ and 
+        $\Gamma\proves b\to(a\to b)$. Using MP we have $\Gamma\proves a\to b$
+    \end{case}
+
+    Then we suppose this is true for all proof sequences with length
+    less than $n$. The last formula comes from either the axiom set $\Gamma$
+    or the logic axioms. For the former, It has already been shown, so we
+    suppose $b$ is obtained by MP, i.e., we can find $i,j<n$ such that 
+    $\varphi_i=c\to b$ and $\varphi_j=c$. By definition, this is 
+    $\Gamma,a\proves c$ and $\Gamma,a\proves c\to b$. Applying the
+    inductive hypothesis, we have $\Gamma\proves a\to c$, 
+    $\Gamma\proves a\to(c\to b)$. Note we also has a logical axiom
+    $\Gamma\proves (a\to(c\to b))\to((a\to c)\to (a\to b))$.
+    Applying MP twice, we derive $\Gamma\proves a\to b$.
+\end{proof}
+
 \section{Soundness and Completeness}
-An assignment $v:V\to \two$ satisfies $\Gamma$ if for any $\phi\in\Gamma$,
-$\bar{v}(\phi)=\one$. For a wff $\phi$, if for any assignment 
-$v:V\to\two$ satisfiying $\Gamma$, $\bar{v}(\phi)=\one$, then $\phi$ is
-called the semantic consequent of $\Gamma$, written as $\Gamma\models\phi$.
+An assignment $v:V\to \two$ satisfies $\Gamma$ if for any $\varphi\in\Gamma$,
+$\bar{v}(\varphi)=\one$. For a wff $\varphi$, if for any assignment 
+$v:V\to\two$ satisfiying $\Gamma$, $\bar{v}(\varphi)=\one$, then $\varphi$ is
+called the semantic consequent of $\Gamma$, written as $\Gamma\models\varphi$.
 
 \begin{theorem}
-    The deduction system is sound, i.e., $\Gamma\proves\phi$ implies
-    $\Gamma\models\phi$. 
+    The deduction system is sound, i.e., $\Gamma\proves\varphi$ implies
+    $\Gamma\models\varphi$. 
 \end{theorem}
 
 \begin{theorem}
-    The deduction system is complete, i.e., $\Gamma\models\phi$ implies
-    $\Gamma\proves\phi$. 
+    The deduction system is complete, i.e., $\Gamma\models\varphi$ implies
+    $\Gamma\proves\varphi$. 
 \end{theorem}
 
 These two relations are the core concern of a logic system. The soundness

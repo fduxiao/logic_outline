@@ -13,6 +13,10 @@
 \newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{lemma}{Lemma}[chapter]
 
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+
 \theoremstyle{remark}
 \newtheorem*{caveat}{\it CAVEAT}
 \newtheorem{remark}{\it Remark}[chapter]
@@ -30,6 +34,7 @@
 \newcommand{\name}[1]{\text{\sf #1}}
 \newcommand{\proves}{\vdash}
 \newcommand{\iu}{{i\mkern1mu}}
+\newcommand{\real}{\mathbb{R}}
 \newcommand{\complex}{\mathbb{C}}
 
 \usepackage{mathrsfs}
@@ -66,7 +71,7 @@
 \chapter{Other Useful Examples}
 \label{monad-examples}
 
-**\appendix
+\appendix
 \input{cpc.tex}
 
 \bibliographystyle{plain}

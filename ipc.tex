@@ -2,6 +2,282 @@
 \label{intuitionistic-logic}
 
 In this chapter I mainly discuss the intuitionistic propositional logic
-(or intuitionistic propositional logic calculus, IPC), the logic used
-in Curry-Howard correspondence. Unlike the classical propositional 
-logic\footnote{\autoref{classical-logic}} (CPC),
+(or intuitionistic propositional logic calculus, IPC) contrast to the
+classical propositional calculus\footnote{\autoref{classical-logic}} 
+(CPC), which is the logic used
+in Curry-Howard correspondence. In this logic, the {\it Law of Excluded
+Middle} (LEM) is not included as a tautology, but it also has the 
+completeness part with the semantic model of Heyting algebra. 
+This doesnot mean the logic is not as expressive as classical logic.
+Indeed, Glivenko gave a proof in 1929 \cite{glivenko1929quelques} saying
+that each CPC tautology can be proved in IPC with a {\it double negation}
+translation. The key fact is the elimination of double negation, i.e.,
+$\neg\neg\neg\neg p\proves \neg\neg p$. (Actually we can achieve a better
+$\neg\neg\neg p\proves\neg p$.) This further gives rise to the {\it
+Continuation Passing Style} (CPS) transformation in programming and 
+combinatory logic, and it can be described with a monad, which is a
+magic tool to represent some logic calculus or {\it encapsulation}.
+
+\section{Natural Deduction}
+\newcommand{\formula}{\mathscr{F}}
+
+Given a set $V$ of propositional variables, the well formed
+formulas are defined as the recursive set:
+$$
+    \formula ::= \bot 
+        \mid V 
+        \mid (\formula \to \formula) 
+        \mid (\formula \vee \formula)
+        \mid (\formula \wedge \formula)
+$$
+
+The variables $V$ represent some particular propositions. For those in
+$V$, I will use capital English letters $A,B,C$, but for a member in 
+$\formula$, I will use lowercase letters $a,b,c$ or Greek letters 
+$\varphi,\psi,\theta$. The arrow $\to$ means implication, the wedge $\wedge$
+means conjunctions, i.e. $a\wedge b$ means `$a$ and $b$', and
+$a\vee b$ means disjunction `$a$ or $b$'. The bottom $\bot$ means 
+absurdity and thus the negation $\neg a$ is an alias to $a\to\bot$.
+The negation only means $a$ will trigger the absurdity and thus everything
+according to the principle of explosion (ex falso quodlibet). Together
+with other interpretation of formulas, we form a {\it natural deduction
+system}. 
+
+\begin{definition}
+    Let $\Gamma$ be a set of formulas, for any formula $\varphi$, we define
+    the relation $\Gamma\proves\varphi$ with the following rules:
+    \begin{itemize}
+        \item Axiom: $\Gamma,\varphi\proves\varphi$
+        \item $\wedge$-Introduction: $\infer{\Gamma\proves\varphi\wedge\psi}
+            {\Gamma\proves\varphi & \Gamma\proves \psi}$
+
+            $\wedge$-Elimination:
+            $\infer{\Gamma\proves\varphi}{\Gamma\proves\varphi\wedge\psi}$\ \  
+            $\infer{\Gamma\proves\psi}{\Gamma\proves\varphi\wedge\psi}$
+        \item $\vee$-Introduction: 
+            $\infer{\Gamma\proves\varphi\vee\psi}{\Gamma\proves\varphi}$\ \  
+            $\infer{\Gamma\proves\varphi\vee\psi}{\Gamma\proves\psi}$
+
+            $\vee$-Elimination:
+            $\infer{\Gamma\proves\rho}
+            {\Gamma,\varphi\proves\rho & \Gamma,\psi\proves\rho & \Gamma\proves\varphi\vee\psi}$
+
+        \item $\to$-Introduction: 
+            $\infer{\Gamma\proves\varphi\to\psi}{\Gamma,\varphi\proves\psi}$
+
+            $\to$-Elimination:
+            $\infer{\Gamma\proves\psi}{\Gamma\proves\varphi\to\psi & \Gamma\proves\varphi}$
+        \item $\bot$-Elimination:
+            $\infer{\Gamma\proves\varphi}{\Gamma\proves\bot}$
+    \end{itemize}
+\end{definition}
+
+Unlike CPC, we define the $\proves$
+relation with introduction and elimination rules instead of logical axioms
+this time. The horizonal line means if you have obtained the relation 
+$\proves$ above the line, then you can derive the relation under the line. 
+Thus a proof of $\Gamma\proves\varphi$ is a tree, e.g. (note $\neg p$ is an
+abbreviation for $p\to\bot$)
+
+\begin{equation}
+    \label{nnLEM}
+    $$
+    \infer{\proves\neg\neg(p\vee\neg p)}{
+        \infer{\neg(p\vee\neg p)\proves\bot}{
+            \neg(p\vee\neg p)\proves \neg(p\vee\neg p)
+            &
+            \infer{\neg(p\vee\neg p)\proves p\vee\neg p}{
+                \infer{\neg(p\vee\neg p)\proves\neg p}{
+                    \infer{\neg(p\vee\neg p),p\proves\bot} {
+                        \neg(p\vee \neg p), p\proves\neg(p\vee\neg p)
+                        &
+                        \infer{\neg(p\vee\neg p), p\proves p\vee\neg p}{
+                            \neg(p\vee\neg p),p\proves p
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $$
+\end{equation}
+
+The natural deduction, I think, is a generalization of {\it deduction theorem}
+(\autoref{deduction-theorem}). There's actually a sequential form of natural
+deduction system, which is handled with {\it combinatory logic} (Chapter 5
+of \cite{Curry-Howard}), but unlike the sequential version, the deduction
+rule is more intuitive in our proof. (Think about how Curry-Howard
+correspondence helps to quickly check a formula 
+$(a\to b)\to (b\to c)\to(a\to c)$ is a tautology or not.)
+
+\section{Heyting Algebra and Kripke Model}
+Obviously you can still define the assignment $v:V\to\two$ and extend
+it to $\formula$. No doubt you can find the `soundness' part, i.e.,
+if $v(\varphi)=\one$ for all $\varphi\in\Gamma$, and $\Gamma\proves\psi$,
+then $v(\psi)=\one$. Let me make this more general.
+\begin{definition}\footnote{A definition from \cite{Curry-Howard}.}
+    A field of sets (over $X$) is a nonempty family $\mathcal{R}$ of
+    subsets of $X$ closed under unions, intersections and complements. 
+\end{definition}
+Note that since $\mathcal{R}$ is closed under complements ($-$), unions 
+and intersections, for any $A\in\mathcal{R}$, $X=A\cup(-A)\in\mathcal{R}$
+and $\emptyset=A\cap(-A)\in\mathcal{R}$.
+
+We can define the assignment as a function $v: V\to\mathcal{R}$ with
+extension $\bar{v}:\formula\to\mathcal{R}$:
+\begin{itemize}
+    \item $\bar{v}(A)=v(A)$ for all $A\in V$.
+    \item $\bar{v}(\bot)=\emptyset$.
+    \item $\bar{v}(a\vee b)=\bar{v}(a)\cup \bar{v}(b)$.
+    \item $\bar{v}(a\wedge b)=\bar{v}(a)\cap \bar{v}(b)$.
+    \item $\bar{v}(a\to b)=(X-\bar{v}(a))\cup \bar{v}(b)$.
+\end{itemize}
+
+(Think about the set defined by a formula in model theory. What if you
+take the conjunction or disjunction of two such formulas?).
+
+The behavior of field of sets can be generalzed by {\it Boolean algebra}.
+In \cite{Curry-Howard}, it is define as an algebra system 
+$\mathcal{B}=\left<B,\cup,\cap,-,0,1\right>$ such that
+\begin{enumerate}
+    \item $\cup,\cap$ are associative and commutative and mutually distributive
+    \item $a\cup 0=a$, $a\cap 1=a$
+    \item $-a\cup a=1$, $-a\cap a=0$
+\end{enumerate}
+\newcommand{\Imply}{\Rightarrow}
+We can then interpret truth as $v(p)=1$ for some Boolean algebra.
+Clearly we cannot have the completeness with such an interpretation,
+because $v(p\vee\neg p)=1$ for any Boolean algebra, but it is not provable.
+\cite{Curry-Howard} further gives the model of {\it Heyting algebra} as
+$\mathcal{H}=\left<H,\cup,\cap,\Imply,-,0,1\right>$ with some extra
+axioms such as distributivity, but I prefer the category-theoretical
+version in \cite{cat-awodey}. (Recall the relation between lambda
+calculus and Cartesian Closed Category). 
+
+\begin{definition}
+    A Heyting algebra is a poset $\le$ (category) with finite
+    products(meets), coproducts(joins) and exponentials.
+\end{definition}
+\begin{remark}
+    In a poset, the product $p\times q$ is acturally the 
+    {\it greatest lower bound} $p\cap q$ (or $p\wedge q$), with the coproduct
+    $p+q$ the {\it least upper bound} $p\cup q$ (or $p\vee q$).
+    The nullary product and coproduct are the terminal object $1$
+    and initial object $0$. In Boolean algebra, the `implication'
+    $a\to b$ is interpreted as $-a\cup b$, but in Heyting algebra,
+    it is the exponential rule $b^a$ (written as $a\Imply b$) satisfying
+    the adjunction rule $a\cap b\le c$ iff $a\le b\Imply c$. The exponential
+    means the fail of LEM(law of excluded middle) unlike Boolean algebra.
+    The negation is alias to $-a=a\Imply 0$. 
+\end{remark}
+\begin{remark}
+    A Heyting algebra is obviously a CCC(Cartesian Closed Category).
+    In such a category, we have the following canonical isomorhpism.
+    $$
+        (A+B)\times C\cong(A\times C)+(B\times C)
+    $$
+    Thus a Heyting algebra is actually a distributive lattice.
+\end{remark}
+
+Of course, there should be a Heyting algebra that is not a Boolean
+algebra. Think about the poset (under set inclusion $\subseteq$) of
+all open sets of the plane $\real^2$. Since 
+$A\Imply B=\text{Int}(-A\cup B)$, it is not a Boolean algebra. 
+
+\newcommand{\Heyting}{\mathcal{H}}
+Now we can attatch to IPC a semantics of Heyting algebra.
+Given Heyting algebra $\Heyting$ and $v: V\to \Heyting$, we
+extend it to $\formula$ as follows.
+\begin{itemize}
+    \item $\bar{v}(A)=v(A)$ for all $A\in V$.
+    \item $\bar{v}(\bot)=0$.
+    \item $\bar{v}(a\vee b)=\bar{v}(a)\cup \bar{v}(b)$.
+    \item $\bar{v}(a\wedge b)=\bar{v}(a)\cap \bar{v}(b)$.
+    \item $\bar{v}(a\to b)=\bar{v}(a)\Imply \bar{v}(b)$.
+\end{itemize}
+(The bar may be omitted.)
+
+Let me introduce the following notations (the relation $\models$).
+\begin{itemize}
+    \item $\Heyting,v\models \varphi$ iff $v(\varphi) = 1$.
+    \item $\Heyting\models\varphi$ iff $\Heyting,v\models\varphi$ for all $v$.
+    \item $\Heyting,v\models \Gamma$ iff $\Heyting,v\models \varphi$ for all $\varphi\in\Gamma$.
+    \item $\Heyting\models\Gamma$ iff $\Heyting,v\models\Gamma$ for all $v$.
+    \item $\models\varphi$ iff $\Heyting,v\models\varphi$ for all $\Heyting, v$.
+    \item $\Gamma\models\varphi$ iff $\Heyting,v\models\Gamma$ implies $\Heyting,v\models\varphi$ for all $\Heyting, v$
+\end{itemize}
+
+\begin{theorem} (Soundness and Completeness)
+    In IPC, $\Gamma\proves\varphi$ iff $\Gamma\models\varphi$.
+\end{theorem}
+\newcommand{\Lindenbaum}{\mathcal{L}}
+\begin{proof}
+    The soundness is obvious. For the completeness, just like the
+    completeness for CPC or first-order logic, we define
+    the {\it Lindenbaum algebra} $\Lindenbaum_\Gamma$.
+    Define $\sim$ to be the equivalence relation:
+    $$
+        \theta\sim\psi\text{ iff }\Gamma\proves\theta\to\psi
+        \text{ and }\Gamma\proves{\psi\to\theta}.
+    $$
+    Define a poset $\Lindenbaum_\Gamma=\formula/_\sim=\{[\theta]_\sim
+    \mid \theta\in\formula\}$ with order $[\theta]_\sim$ iff $\Gamma
+    \proves\theta\to\psi$. Other facilities of a Heyting algebra are
+    clearly:
+    \begin{itemize}
+        \item $[a]_\sim\cup[b]_\sim=[a\vee b]_\sim$
+        \item $[a]_\sim\cap[b]_\sim=[a\wedge b]_\sim$
+        \item $[a]_\sim\Imply[b]_\sim=[a\to b]_\sim$
+        \item $-[a]_\sim=[\neg a]_\sim$
+        \item $0=[\bot]_\sim$
+        \item $1=[\bot\to\bot]_\sim$
+    \end{itemize}
+    We define $v(\psi)=[\psi]_\sim$. Clearly for all 
+    $\psi\in\Gamma$, $\Gamma\proves\psi$. Thus $\Lindenbaum_\Gamma,
+    v\models \Gamma$. Since $\Gamma\models\varphi$, we know 
+    $v(\varphi)=1=[\bot\to\bot]_\sim$, i.e., $\Gamma\proves (\bot\to\bot)
+    \to \varphi$. This forces $\Gamma\proves\varphi$.
+\end{proof}
+For example {\it Peirce's law} $((p\to q)\to p)\to p$ is not 
+intuitionistically valid. (Consider the algebra of $\mathcal{O}(\real^2)$)
+
+Actually we can prove the following to write a efficient computer
+programm to check whether a formula is valid or not (decidability).
+\begin{theorem}
+    To verify whether a formula of length $n$ is valid, it suffices
+    to verify it in all Heyting algebras of cardinality less than or
+    equal to $2^{2^n}$.
+\end{theorem}
+\begin{proof}
+    Please refer to \cite{Curry-Howard}.
+\end{proof}
+
+\section{Glivenko's Theorem}
+As promised before, I will prove the double negation translation.
+The theorem is constructive and IPC is constructive. Thus the
+theorem gives a constructive inspection of a traditional proof.
+The deduction system I present in \autoref{Mendelssohn-system} 
+(Mendelssohn's variation of Hilbert system) uses
+`{\it proof by contradiction}' as a third logical axiom. The first
+two axioms guarantee the deduction theorem (IPC tautologies).
+Actually in IPC (or in CPC without the third axiom), 
+the axiom `proof by contradiction' is equivalent to the law of
+excluded middle (or double negation law $\neg\neg p\to p$). The
+theorem turns every proof in CPC into constructive ones except
+that the double negation law is not constructive. This is the failure
+of law of excluded middle as value in Heyting algebra ($p\vee\neg p$
+is no longer mapped to $1$ in Heyting algebra). For convenience,
+when referring to a {\it classical tautology}, I mean a formula
+derivable from the Mendelssohn system, but with the third logical
+axiom (proof by contradicton) replaced by Law of Excluded Middle. 
+
+\begin{theorem}
+    \label{glivenko-theorem}
+    (Glivenko's Theorem) A formula $\varphi$ is a classical tautology
+    iff $\proves\varphi$ in IPC. 
+\end{theorem}
+\begin{proof}
+    One direction is trivial. 
+    I've already shown that $\proves \neg\neg(p\vee\neg p)$ 
+    \eqref{nnLEM}.
+\end{proof}
