@@ -34,7 +34,8 @@ $$
 The variables $V$ represent some particular propositions. For those in
 $V$, I will use capital English letters $A,B,C$, but for a member in 
 $\formula$, I will use lowercase letters $a,b,c$ or Greek letters 
-$\varphi,\psi,\theta$. The arrow $\to$ means implication, the wedge $\wedge$
+$\varphi,\psi,\theta$ unless I mention otherwise explicitly. 
+The arrow $\to$ means implication, the wedge $\wedge$
 means conjunctions, i.e. $a\wedge b$ means `$a$ and $b$', and
 $a\vee b$ means disjunction `$a$ or $b$'. The bottom $\bot$ means 
 absurdity and thus the negation $\neg a$ is an alias to $a\to\bot$.
@@ -102,6 +103,11 @@ abbreviation for $p\to\bot$)
     $$
 \end{equation}
 
+By induction on the tree, we can also prove the following.
+$$
+\infer{\Gamma,q\proves p}{\Gamma\proves p}
+$$
+
 The natural deduction, I think, is a generalization of {\it deduction theorem}
 (\autoref{deduction-theorem}). There's actually a sequential form of natural
 deduction system, which is handled with {\it combinatory logic} (Chapter 5
@@ -110,7 +116,7 @@ rule is more intuitive in our proof. (Think about how Curry-Howard
 correspondence helps to quickly check a formula 
 $(a\to b)\to (b\to c)\to(a\to c)$ is a tautology or not.)
 
-\section{Heyting Algebra and Kripke Model}
+\section{Heyting Algebra}
 Obviously you can still define the assignment $v:V\to\two$ and extend
 it to $\formula$. No doubt you can find the `soundness' part, i.e.,
 if $v(\varphi)=\one$ for all $\varphi\in\Gamma$, and $\Gamma\proves\psi$,
@@ -138,7 +144,7 @@ take the conjunction or disjunction of two such formulas?).
 
 The behavior of field of sets can be generalzed by {\it Boolean algebra}.
 In \cite{Curry-Howard}, it is define as an algebra system 
-$\mathcal{B}=\left<B,\cup,\cap,-,0,1\right>$ such that
+$\mathcal{B}=\angletuple{B,\cup,\cap,-,0,1}$ such that
 \begin{enumerate}
     \item $\cup,\cap$ are associative and commutative and mutually distributive
     \item $a\cup 0=a$, $a\cap 1=a$
@@ -149,7 +155,7 @@ We can then interpret truth as $v(p)=1$ for some Boolean algebra.
 Clearly we cannot have the completeness with such an interpretation,
 because $v(p\vee\neg p)=1$ for any Boolean algebra, but it is not provable.
 \cite{Curry-Howard} further gives the model of {\it Heyting algebra} as
-$\mathcal{H}=\left<H,\cup,\cap,\Imply,-,0,1\right>$ with some extra
+$\mathcal{H}=\angletuple{H,\cup,\cap,\Imply,-,0,1}$ with some extra
 axioms such as distributivity, but I prefer the category-theoretical
 version in \cite{cat-awodey}. (Recall the relation between lambda
 calculus and Cartesian Closed Category). 
@@ -180,8 +186,8 @@ calculus and Cartesian Closed Category).
 \end{remark}
 
 Of course, there should be a Heyting algebra that is not a Boolean
-algebra. Think about the poset (under set inclusion $\subseteq$) of
-all open sets of the plane $\real^2$. Since 
+algebra. Think about the poset $\opensets(\real^2)$ (under set inclusion 
+$\subseteq$) of all open sets of the plane $\real^2$. Since 
 $A\Imply B=\text{Int}(-A\cup B)$, it is not a Boolean algebra. 
 
 \newcommand{\Heyting}{\mathcal{H}}
@@ -239,7 +245,7 @@ Let me introduce the following notations (the relation $\models$).
     \to \varphi$. This forces $\Gamma\proves\varphi$.
 \end{proof}
 For example {\it Peirce's law} $((p\to q)\to p)\to p$ is not 
-intuitionistically valid. (Consider the algebra of $\mathcal{O}(\real^2)$)
+intuitionistically valid. (Consider the algebra of $\opensets(\real^2)$)
 
 Actually we can prove the following to write a efficient computer
 programm to check whether a formula is valid or not (decidability).
@@ -251,6 +257,87 @@ programm to check whether a formula is valid or not (decidability).
 \begin{proof}
     Please refer to \cite{Curry-Howard}.
 \end{proof}
+
+\section{Kripke Model}
+There's also another way to give semantics for IPC, i.e., the
+Kripke model. 
+\newcommand{\Kripke}{\mathcal{K}}
+\begin{definition}
+    A Kripke model $\Kripke$ is a poset $K$($\le$) of possible worlds 
+    together with a relation $\Vdash$ between each world and a 
+    propositional variable, i.e., $\Kripke=\angletuple{K,\le,\Vdash}$ 
+    such that
+    \begin{itemize}
+        \item for $w\in K$ and variable $A$, if $w\Vdash A$ then for 
+        all $w'\ge w$, $w'\Vdash A$;
+        \item $w\Vdash \varphi\vee\psi$ iff $c\Vdash\varphi$ or $c\Vdash\psi$;
+        \item $w\Vdash \varphi\wedge\psi$ iff $c\Vdash\varphi$ and $c\Vdash\psi$;
+        \item $w\Vdash \bot$ never happens;
+        \item $w\Vdash\varphi\to\psi$ iff $w'\Vdash\psi$ for all $w'\ge w$ such that $w'\Vdash\phi$.
+    \end{itemize}
+\end{definition}
+We write $\Kripke\Vdash \varphi$ for ``for all $w\in\Kripke$, $w\Vdash\varphi$''.
+
+\begin{lemma}
+    It can be shown that for a Kripke model $\Kripke$,
+    \begin{itemize}
+        \item $w\Vdash\neg\varphi$ iff $w'\not\Vdash\varphi$ for all $w'\le w$;
+        \item If $w\le w'$ and $w\Vdash\varphi$, then $w'\Vdash\varphi$.
+    \end{itemize}
+    \admitted
+\end{lemma}
+
+\begin{definition}
+    A {\it filter} in Heyting algebra $\Heyting$ is a nonempty subset $F$
+    closed under $\cap$ and $\le$, i.e.,
+    \begin{itemize}
+        \item $a,b\in F$ implies $a\cap b\in F$;
+        \item $a\in F$ and $a\le b$ implies $b\in F$. 
+    \end{itemize}
+\end{definition}
+
+Just like the ideals in a ring, we say a proper filter is {\it prime}
+provided $a\cup b\in F$ implies $a\in F$ or $b\in F$. Analogous to
+the existence of maximal ideal, we can prove that for each proper filter
+$F\subseteq\Heyting$ with $a\not\in F$, there exists a prime filter
+$G\subseteq\Heyting$ such that $a\not\in G$. 
+
+The set of all prime filters of a Heyting algebra can be used to define a
+Kripke model:
+\begin{lemma}
+    Given $\Heyting$ and assignment $v$, we can define a Kripke
+    model $\Kripke$ such that $\Heyting,v\models \varphi$ iff 
+    $\Kripke\models\varphi$.
+\end{lemma}
+\begin{proof}
+    Let $\Kripke=\angletuple{<,\le,\Vdash}$ where $K$ is the set of
+    all prime filters in $\Heyting$. $\le$ is set inclusion. And
+    we define $F\Vdash A$ iff $v(A)\in F$ for all filters $F$ and
+    variable $A$. 
+\end{proof}
+
+Thus we have the completeness and soundness for Kripke semantics.
+\begin{theorem}
+    $\Gamma\proves\varphi$ iff for all Kripke models $\Kripke$,
+    $\Kripke\Vdash\Gamma$ implies $\Kripke\Vdash\varphi$.
+    \admitted
+\end{theorem}
+
+An interesting application is that if $\proves \varphi\vee\psi$, then
+either $\proves \varphi$ or $\proves\psi$. 
+
+\null
+
+The $\Vdash$ relation for possible worlds can be viewed as a
+category of variable, i.e. a map $\formula\to \two^K=
+\Hom_\Pos(K,\two)$. We can generalize it as a
+cartesian closed category of the form $\Sets^I$ for a poset $I$. 
+For example, a Kripke model for group theory is an $I$-indexed
+group. if $I=\opensets(X)\op$ for some topological space $X$,
+then this will be a presheaf of groups. Unfortunately, this
+part is also vaguely described in \cite{cat-awodey}. I think
+I will go ahead with the book \cite{Introduction-to-higher-order-categorical-logic}
+for this topic. 
 
 \section{Glivenko's Theorem}
 As promised before, I will prove the double negation translation.
@@ -271,6 +358,108 @@ when referring to a {\it classical tautology}, I mean a formula
 derivable from the Mendelssohn system, but with the third logical
 axiom (proof by contradicton) replaced by Law of Excluded Middle. 
 
+\begin{lemma}
+    (Affirmation of the consequent)
+    $$
+    \proves a\to(b\to a)
+    $$
+\end{lemma}
+\begin{proof}
+    $$
+    \infer{\proves a\to(b\to a)}{\infer{
+        a\proves b\to a
+    }{a,b\proves a}}
+    $$
+\end{proof}
+
+\begin{lemma}
+    (Distributivity of Implication)
+    $$
+    \proves (a\to(b\to c))\to ((a\to b)\to (a\to c))
+    $$
+\end{lemma}
+\begin{proof}
+    Let $\Gamma=\{a\to(b\to c), a\to b\}$.
+    $$
+    \infer{\proves (a\to(b\to c))\to((a\to b)\to (a\to c))}{
+        \infer{a\to(b\to c)\proves (a\to b)\to (a\to c)}{
+            \infer{\Gamma\proves a\to c}{\infer{\Gamma,a\proves c}{
+                \infer{\Gamma,a\proves b}{
+                    \Gamma,a\proves a\to b & \Gamma,a\proves a
+                }
+                &
+                \infer{\Gamma,a\proves b\to c}{
+                    \Gamma,a\proves a & \Gamma,a\proves a\to(b\to c)
+                }
+            }}
+        }
+    }
+    $$
+\end{proof}
+
+\newcommand{\unit}{\name{unit}}
+\begin{lemma}
+    \label{unit-ipc}
+    (Unit) For formula set $\Gamma$ and formula $\varphi$
+    $$
+        \infer{\Gamma\proves \neg\neg \varphi}{\Gamma\proves \varphi}.
+    $$
+    ($\proves \varphi\to\neg\neg\varphi$)
+    Or, in $\lambda$-calculus(Curry-Howard Correspondence), this a function
+    $$
+        \unit_\varphi: \varphi \to (\varphi\to \zero)\to \zero.
+    $$
+\end{lemma}
+\begin{proof}
+    $$
+        \infer{\Gamma\proves \neg\neg \varphi}{
+            \infer{\Gamma,\neg \varphi\proves\bot}{
+                \Gamma,\neg \varphi\proves\neg \varphi &
+                \Gamma,\neg \varphi\proves \varphi
+            }
+        }
+    $$
+    $$\unit_\phi(x:\phi, f:\phi\to\zero) \defn f(x):\zero$$
+    $$\text{or }\unit_\phi = \lambda x.\lambda f. f\ x$$
+\end{proof}
+
+\newcommand{\bind}{\name{bind}}
+\begin{lemma}
+    \label{bind-ipc}
+    (Bind)
+    $$
+        \infer{\Gamma\proves\neg\neg b}{
+            \Gamma,a\proves\neg\neg b
+             & \Gamma\proves\neg\neg a
+        }
+    $$
+    Or $\bind_{a,b}:((a\to \zero)\to\zero)\to(a\to((b\to \zero)\to \zero))\to (b\to \zero)\to \zero$
+    ($\neg\neg a\to (a\to \neg\neg b)\to \neg\neg b$).
+\end{lemma}
+\begin{proof}
+    $$
+    \infer{\Gamma\proves\neg\neg b}{\infer{\Gamma,\neg b\proves\bot}{
+        \Gamma\proves\neg\neg a &
+        \infer{\Gamma,\neg b\proves\neg a}{
+            \infer{\Gamma,a,\neg b\proves\bot}{
+                \Gamma,a,\neg b\proves\neg b
+                &
+                \Gamma,a,\neg b\proves\neg\neg b
+            }
+        }
+    }}
+    $$
+
+    $$
+    \bind_{a,b}(x:(a\to\zero)\to \zero, f: a\to(b\to \zero)\to\zero)
+    \defn \lambda k. x\ (\lambda z. f\ z\ b).
+    $$
+    Note that $k: b\to \zero$ and $z: a$. Thus $f\ z:(b\to\zero)\to\zero$
+    and $(f\ z)\ k$ (or $f(z,k)$) has type $\zero$. Then the term
+    $\lambda z.f\ z\ b: a\to\zero$. Applying $x$ to this, we get $\zero$.
+    $k$ is called continuation and this function is used in 
+    \autoref{monad-examples} later.
+\end{proof}
 \begin{theorem}
     \label{glivenko-theorem}
     (Glivenko's Theorem) A formula $\varphi$ is a classical tautology
@@ -280,4 +469,69 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
     One direction is trivial. 
     I've already shown that $\proves \neg\neg(p\vee\neg p)$ 
     \eqref{nnLEM}.
+    Suppose the proof sequence towards $\varphi$ is $\varphi_1,\cdots,
+    \varphi_n$ and $\varphi_n=\varphi$. By reordering, we can assume
+    the proof sequence is actually $p_1\vee\neg p_1,\cdots, 
+    p_k\vee\neg p_k$, $\varphi_1,\cdots,\varphi_n$ and $\varphi_i$ are
+    derived with intuitionistic tautologies and modus ponens. Thus
+    we have $\Gamma\proves \varphi_1$ in IPC, where 
+    $\Gamma=\{p_1\vee\neg p_1\cdots,p_k\vee\neg p_k\}$,
+    and $\Gamma,\varphi_1\proves\varphi_2$. This implies
+    $$
+        \infer{\Gamma\proves\varphi_2}{
+            \infer{\Gamma\proves\varphi_1\to\varphi_2}{
+                \Gamma,\varphi_1\proves\varphi_2
+            }
+            &
+            \Gamma\proves\varphi_1
+        }
+    $$
+    (Note the occurence of $\Gamma,\varphi_1\proves\varphi_2$ should be
+    another tree of natural deduction representing the proof of the 
+    relation $\proves$.)
+    Similarly, we get $\Gamma\proves \varphi$ ($\varphi_n=\varphi$).
+    Using \Cref{unit-ipc}, we have $\Gamma\proves\neg\neg\varphi$.
+    Then we eliminate $p_i\vee\neg p_i$ with \Cref{bind-ipc}.
+    Let $\Gamma_k=\Gamma$, $\Gamma_{i-1}=\Gamma_i\setminus(p_i\vee\neg p_i)$
+    $$
+        \infer{\proves \neg\neg\varphi}{\infer{\cdots}{
+            \infer{\Gamma_{k-1}\proves \neg\neg\varphi}{
+                \Gamma_k\proves \neg\neg\varphi
+                &
+                \Gamma_{k-1}\proves \neg\neg(p_k\vee\neg p_k)
+            }
+            &
+            \Gamma_{k-2}\proves \neg\neg(p_2\vee\neg p_2)
+        }}
+    $$
 \end{proof}
+
+\begin{remark}
+    The $\bind$ function is helpful when we try proving something
+    with Curry-Howard correspondence, i.e., it helps to generate
+    lambda terms efficiently. (Forget about the convention $A$ 
+    representing propositional variables for a while.)
+    For example, if we have
+    $$ma:\neg\neg A,$$
+    $$f: A\to\neg\neg B,$$
+    $$mh:\neg\neg(B\to C),$$
+    $$g: C\to\neg\neg D,$$
+    we can obtain a term of type $\neg\neg D$ easily.
+    \eq{
+        & \bind\ ma\ (\lambda a. \\
+        & \quad \bind\ (f\ a)\ (\lambda b. \\
+        & \quad\quad \bind\ mh\ (\lambda h. \\
+        & \quad\quad\quad g\ (h\ b) \\
+        & \quad\quad) \\
+        & \quad)\\
+        & )
+    }
+    Or may be you prefer this form
+    $$
+        \bind(ma,\lambda a.\bind(f(a),\lambda b.\bind(mh,\lambda h.g(h(b))))).
+    $$
+    Try to infer the type of each term in this process. 
+    It seems insane to write a proof like this, but actually there's a
+    concept called {\it monad} to simplify the process. Let me introduce
+    it in the next chapter. 
+\end{remark}

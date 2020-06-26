@@ -3,7 +3,8 @@
 \usepackage{proof}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{enumitem}
-\usepackage{stmaryrd} 
+\usepackage{stmaryrd}
+\usepackage{hyperref,cleveref}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
@@ -11,7 +12,7 @@
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[chapter]
-\newtheorem{lemma}{Lemma}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
 
 \newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
 \theoremstyle{case}
@@ -36,6 +37,13 @@
 \newcommand{\iu}{{i\mkern1mu}}
 \newcommand{\real}{\mathbb{R}}
 \newcommand{\complex}{\mathbb{C}}
+\newcommand{\angletuple}[1]{\left<#1\right>}
+\newcommand{\admitted}{\null\hfill\qedsymbol}
+\newcommand{\Hom}{\mathbf{Hom}}
+\newcommand{\Pos}{\mathbf{Pos}}
+\newcommand{\Sets}{\mathbf{Sets}}
+\newcommand{\opensets}{\mathcal{O}}
+\newcommand{\op}{^\name{op}}
 
 \usepackage{mathrsfs}
 \usepackage{titlesec}

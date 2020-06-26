@@ -208,7 +208,7 @@ Let $H=\lambda f.\lambda x.M$ and $F = \Ycomb\ H$. Then
          & = (\lambda f.\lambda x.M)\ F\ y \\
          & = M[f:=F,x:=y].
 }
-$M[f:=F,x:=y]$ shows that the occurance of $f$ in $M$ will be the `defined'
+$M[f:=F,x:=y]$ shows that the occurence of $f$ in $M$ will be the `defined'
 (or not) $F$, i.e. this is a way to write recursive functions.
 For example, if $M$ is something like $\mathbf{IF}\ C\ \mathbf{THEN}\ x
 \ \mathbf{ELSE}\ f\ (\succn\ x)$, then $F\ c_n=_\beta M[f:=F,x:=c_n]=
