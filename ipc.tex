@@ -463,7 +463,7 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
 \begin{theorem}
     \label{glivenko-theorem}
     (Glivenko's Theorem) A formula $\varphi$ is a classical tautology
-    iff $\proves\varphi$ in IPC. 
+    iff $\proves\neg\neg\varphi$ in IPC. 
 \end{theorem}
 \begin{proof}
     One direction is trivial. 
@@ -509,8 +509,8 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
 \begin{remark}
     The $\bind$ function is helpful when we try proving something
     with Curry-Howard correspondence, i.e., it helps to generate
-    lambda terms efficiently. (Forget about the convention $A$ 
-    representing propositional variables for a while.)
+    lambda terms efficiently. (Forget about the convention that $A$ 
+    represents propositional variables for a while.)
     For example, if we have
     $$ma:\neg\neg A,$$
     $$f: A\to\neg\neg B,$$
@@ -518,6 +518,7 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
     $$g: C\to\neg\neg D,$$
     we can obtain a term of type $\neg\neg D$ easily.
     \eq{
+        \label{bind-a-lot}
         & \bind\ ma\ (\lambda a. \\
         & \quad \bind\ (f\ a)\ (\lambda b. \\
         & \quad\quad \bind\ mh\ (\lambda h. \\
@@ -527,9 +528,9 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
         & )
     }
     Or may be you prefer this form
-    $$
+    \begin{equation}
         \bind(ma,\lambda a.\bind(f(a),\lambda b.\bind(mh,\lambda h.g(h(b))))).
-    $$
+    \end{equation}
     Try to infer the type of each term in this process. 
     It seems insane to write a proof like this, but actually there's a
     concept called {\it monad} to simplify the process. Let me introduce

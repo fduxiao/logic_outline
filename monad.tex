@@ -1,0 +1,335 @@
+\chapter{Monad}
+\label{monad}
+
+Let's recall what is an {\it adjunction} in category theory.
+\def\mathbi#1{\textbf{\em #1}} 
+\newcommand{\Src}{\mathbi{Src}}
+\newcommand{\Trg}{\mathbi{Trg}}
+
+\begin{definition}
+    An adjunction is a pair of functors $F:\Src\to\Trg$, $G:\Trg\to\Src$ 
+    together with two assignments $(\cdot)^\sharp,(\cdot)_\flat$, a pair 
+    of mutually inverse bijections (called transposition assignments)
+    \eq {
+        \Src[A,GS] &\to \Trg[FA, S] \\
+        f &\mapsto f^\sharp \\
+        \\
+        \Trg[FA, S] &\to \Src[A,GS] \\
+        g &\mapsto g_\flat
+    }
+    such that the induced two functors $\Src\op\times\Trg\to\Sets$
+    are naturally isomorphic to each other, written as $F\dashv G$. 
+    
+    Here $\Src[A,B]$ is the Hom-set between objects $A,B$ in category
+    $\Src$. A more common notation is $\Hom_\Src(A,B)$. For a functor,
+    the object assignment is written as $FA$, while morphism assignment
+    is written as $F(f)$. 
+
+    There are many other equivalent definitions of adjunction and 
+    notations for category theory. I prefer those in 
+    \cite{simmons2011introduction}.
+\end{definition}
+
+The naturality can be rewritten as for all
+
+$$
+\begin{array}{ccc}
+    \Src & \qquad & \Trg \\\\
+    B\quad A & \text{objects} & S\quad T \\\\
+    B \overset{k} \longrightarrow A & & S \overset{l} \longrightarrow T\\
+    & \text{morphisms} & \\
+    A \underset{f} \longrightarrow GS & & FA \underset{g} \longrightarrow S\\\\
+    (G(l)\circ f\circ k)^\sharp = l\circ f^\sharp\circ F(k) & &
+    G(l)\circ g_\flat \circ k = (l\circ g\circ F(k))_\flat
+\end{array}
+$$
+
+\newcommand{\dual}[2]{
+    \begin{multicols}{2}
+        \begin{center}
+            #1
+        \end{center}
+        \columnbreak 
+        \begin{center}
+            #2
+        \end{center}
+    \end{multicols}
+}
+
+\begin{definition}
+    Given an adjunction $F\dashv G$, we can form two endofunctors
+    $F\circ G$ and $G\circ F$. The transposition assignments give
+    the natural transformations between identity functors and them.
+    For each
+    \dual{$\Src$-object $A$}{$\Trg$-object $S$}
+    we define the
+    \dual{\sf unit}{\sf co-unit}
+    to be the natural transformations
+    \dual{$\eta_A=(\id_{FA})_\flat$}{$\epsilon_S=(\id_{GS})^\sharp$}
+    \dual{$A\overset{\eta_A}\longrightarrow(G\circ F)A$}
+        {$(F\circ G)S\overset{\epsilon_S}\longrightarrow S$}  
+\end{definition}
+
+\section{From Adjunction to Monad}
+Give $F\dashv G$, we define the endofunctor $T=G\circ F:\Src\to\Trg\to\Src$.
+The unit $\eta:\Id\to T$ connects the `codomain' of $T$ with identity.
+A good property of this functor is the elimination transformation.
+Consider the counit at $FA$ for some object $A$
+$$
+    \epsilon_{FA}:FGFA\to FA.
+$$
+Then apply functor G
+$$
+    G(\epsilon_{FA}):GFGFA\to GFA.
+$$
+We define ths as a new transformation (Note $GF=T$)
+$$
+    \mu:T^2\to T
+$$
+The triple $(T,\eta,\mu)$ is called a {\it monad}\footnote{
+Originally the monad is just called a triple as in 
+\cite{Introduction-to-higher-order-categorical-logic}, in which it is
+also said that Huber proved that an adjunction defines a monad. },
+but note that the adjunction also gives you the following commutative diagrams (see \cite{cat-awodey} for a detailed proof): 
+
+$$
+\begin{tikzcd}
+    T \arrow{r}{T\eta} \arrow{d}{\eta_T} \arrow{rd}{\Id} & T^2
+    \arrow{d}{\mu} \\
+    T^2 \arrow{r}{\mu} & T
+\end{tikzcd}
+$$
+
+$$
+\begin{tikzcd}
+    T^3 \arrow{r}{T\mu} \arrow{d}{\mu_T} & T^2
+    \arrow{d}{\mu} \\
+    T^2 \arrow{r}{\mu} & T
+\end{tikzcd}
+$$
+
+Here, $T\eta$ ($T\mu$) means applying the functor $T$ to the morphism 
+$\eta_A:A\to TA$ ($\mu_A: T^2A\to TA$), $\eta_T$ ($\mu_T$) means the 
+morphism $\eta_{TA}:TA\to T^2A$ ($\mu_{TA}:T^3A\to T^2A$)
+induced by the natural transformation. 
+
+\null
+
+If you are familiar with it, the above is the monoidal condition, i.e.
+the monad is just a monoidal object in the category of endofunctors!
+$$
+\begin{tikzcd}
+    T\circ T \arrow{r}{\mu} & T & \Id \arrow[swap]{l}{\eta}
+\end{tikzcd}
+$$
+
+\begin{definition}
+    (Monad) A triple $(T,\eta\mu)$ consisting of an endofunctor $T$
+    and two natural transformations $\eta:\Id\to T$ and $\mu:T^2\to T$
+    is called a monad ($\Id$ is the identity functor) iff 
+    $$
+        \mu\circ\mu_T=\mu\circ T\mu
+    $$
+    $$
+        \mu\circ\eta_T=\mu\circ T\eta=\Id_T.
+    $$
+\end{definition}
+
+The monad states an adjunction purely algebraically. The free 
+construction, the Hom-sets, exponentials, or some other equivalent of 
+adjunction can be replaced by an equational representation. Of course
+I have to prove that each monad gives you an adjunction in the sense
+of `isomorhpism', but let me first give some examples. 
+
+\bigskip
+In a preordered set $(P,\le)$, a monad is a (monotonic) closure 
+operation $T:P\to P$ such that for all $A\in P$, $A\le TA$ and 
+$TTA\le TA$. \bigskip
+
+\newcommand{\powerset}{\mathcal{P}}
+The powerset $\powerset: \Sets\to\Sets$ can be viewed as an endofunctor. 
+The unit $\eta_A:A\to\powerset A$ is the singleton set $a\mapsto \{a\}$. 
+The join\footnote{I'm not sure whether this has a name. The name `join'
+again comes from Haskell.} $\mu:\powerset^2 A\to \powerset A$ is the
+union $\mu_A(\mathscr{A})=\cup_{A\in\mathscr{A}}A$. Now let's explore
+what adjunction gives this monad. 
+
+\newcommand{\cat}{\mathbf}
+
+\section{From Monad to Adjunction}
+\begin{definition}(Resolution Category)
+    For a monad $(T,\eta,\mu)$ on a category $\cat{C}$, a
+    {\it resolution} $(\cat{D},G,F,\epsilon)$ of it consists
+    of a category $\cat{D}$, two functors $F:\cat{C}\to\cat{D}$
+    and $G:\cat{D}\to\cat{C}$ such that $G\circ F=T$ and the
+    equivalence of counit $\epsilon$ such that $G(\epsilon_{FA})=\mu_A$.
+    
+    Further, all resolutions form a category whose morphisms
+    $\Phi:(\cat{D},G,F,\epsilon)$ $\to(\cat{D'},G',F',\epsilon')$ are 
+    functors between the underlying categories such that $\Phi F=F'$,
+    $G'\Phi=G$ and $\Phi\epsilon=\epsilon'\Phi$.
+\end{definition}
+
+We have an initial object and a terminal object in the resolution
+category.
+
+\begin{definition}
+    (Algebra and Eilenberg-Moore category) Given a monad $(T,\eta,\mu)$ 
+    on $\cat{C}$, a {\it $T$-algebra} is a pair $(A,\alpha)$ consisting
+    of an object $A\in\cat{C}$ and a morphism $\alpha: TA\to A$ such that
+    $\id_A=\alpha\circ\eta_A$ and $\alpha\circ\mu_A=\alpha\circ T\alpha$.
+    $$
+    \begin{tikzcd}
+        A \arrow{r}{\eta_A} \arrow{rd}{\id} & TA\arrow{d}{\alpha}
+        & T^2A \arrow{r}{T\alpha}\arrow{d}{\mu_A} & TA\arrow{d}{\alpha}\\
+        & A & TA\arrow{r}{\alpha} & A
+    \end{tikzcd}
+    $$
+    The {\it Eilenberg-Moore} category $\cat{C}^T$ is the category of 
+    all $T$ algebras whose morphisms $h: (A,\alpha)\to(B,\beta)$ are 
+    the original morphisms $h: A\to B$ in $C$ such that 
+    $h\circ\alpha=\beta\circ T(h)$.
+    $$
+    \begin{tikzcd}
+        TA\arrow{d}{\alpha} \arrow{r}{Th} & TB\arrow{d}{\beta} \\
+        A \arrow{r}{h} & B
+    \end{tikzcd}
+    $$
+    Define $G:(A,\alpha)\mapsto A$. Then $F\dashv G$ gives you the monad.
+\end{definition}\bigskip
+
+Let $(A,\alpha)$ be an algebra in $\Sets$. Note the unit and join
+\eq{
+    \eta_A:A\to\powerset A \\
+    a\mapsto \{a\} \\
+    \\
+    \mu_A:\powerset^2A\to\powerset A\\
+    \mathscr{A}\mapsto\bigcup{\mathscr{A}}
+}
+
+Then we have $$\alpha(\eta_A(a))=\alpha(\{a\})=\id_A(a)=a$$ and
+$$\alpha(\mu(\mathscr{A}))=\alpha T\alpha(\mathscr{A})=\{\alpha(S)\mid
+S\in\mathscr{A}\}.$$ If we define $a\le b$ iff $\alpha(\{a,b\})=b$,
+then the two properties ensures each algebra is a complete lattice
+$(A,\le)$. The morphisms between them means $\sup$-preserving maps. 
+
+\begin{definition}
+    \label{kleisli-category}
+    The Kleisli Category $\cat{C}_T$ of a monad $(T,\eta,\mu)$ on 
+    $\cat{C}$ is a category whose objects are the objects of $\cat{C}$ 
+    and there is a morhpism $f: A\to B$ iff there is a morphism $A\to TB$
+    in $\cat{C}$. The composition of $f:A\to B$ and $g:B\to C$ is
+    equivalent to finding a $g\ast f:A\to TC$, given $f:A\to TB$ and 
+    $g:B\to TC$. Since $T(g): TB\to TTC$ and $\mu_C:TTC\to TC$, we have
+    $T(g)f: A\to TTC$ and $g\ast f=\mu_CT(g)f$. Clearly the identity
+    is the unit $\eta$. Define $G_T:\cat{C}_T\to \cat{C}$ by
+    $$
+        G_TA = TA,\quad G_T(f:A\to B)=\mu_BT(f)
+    $$
+    and $F_T: \cat{C}_T\to\cat{C}_T$ by
+    $$
+        F_T(A)=A,\quad F_T(f:A\to B)=\eta_Bf.
+    $$
+    Note that a morphism $f: A\to B$ in $\cat{C}_T$ is equivalent to a
+    morphism $f:A\to TB$ in $\cat{C}$, and $G_T(f): TA\to TB$. (Recall
+    the $\bind$ function (\cref{bind-ipc}). Given an implication 
+    formula $A\to \neg\neg B$ and $\neg\neg A$, we can prove $\neg\neg 
+    B$.) It can be verified that $F_T\dashv G_T$ gives you the monad.
+\end{definition}
+
+\begin{theorem}
+    $\cat{C}^T$ is a terminal object in the category of resolutions,
+    while $\cat{C}_T$ is an initial object. In fact, the Kleisli category
+    is the category of all free algebras as a full subcategory of 
+    Eilenberg-Moore category.
+\end{theorem}
+\begin{proof}
+    Please refer to \cite{Introduction-to-higher-order-categorical-logic}.
+\end{proof}
+
+Let's find the Kleisli category of the power set. Given $f: A \to 
+\powerset{B}$ and $g: B\to\powerset{C}$, the `composition' $g\ast 
+f:A\to\powerset{C}$ is a function $(g\ast f)(a)=\mu_C(\powerset(g)(f(a)))
+=\bigcup_{b\in f(a)}g(b)$.
+
+If your morphism is `function-like' (a set-theoretic function or a
+functon type), then you may have noticed that the key fact behind a
+composition and the functor $G_T$ is a `function' of type
+$(A\to TB)\to TA\to TB$. Thus we can define a monad like this. 
+
+\begin{definition}
+    A Kleisli triple $(T,\eta,(-)^\ast)$ on a category $\cat{C}$ 
+    consists of 
+    \begin{itemize}
+        \item a correspondence $T$ between objects of $\cat{C}$ (which
+        does not need to be an endofunctor), 
+        \item an assignment $\eta$ that for
+        each object $A$, there's a morphism $\eta_A: A\to TA$
+        \item a lift mapping every $f:A\to TB$ to $f^\ast:TA\to TB$
+    \end{itemize}
+    such that
+    \begin{itemize}
+        \item $\eta_A^\ast=\id_{TA}$,
+        \item for $f:A\to TB$, $f^\ast\circ\eta_A=f$,
+        \item for $f:A\to TB$, $g:B\to TC$, $(g^\ast\circ f)
+        ^\ast=g^\ast\circ f^\ast$.
+    \end{itemize}
+    With these properties, we can define $(\eta_B\circ f)^\ast:TA\to TB$
+    for some $f:A\to B$, making $T$ into a functor and $\eta$ is a
+    natural transformation (a lot to verify). 
+    Further, we can define $\mu_A=(\eta_A^\ast)^\ast=(\id_{TA})^\ast: 
+    T^2A\to TA$, making it into a monad. 
+\end{definition}
+
+In fact my definition of the $\bind$ function is a reordering of the lift
+in a Kleisli tuple. This definition gives rise to an interesting 
+syntactic application.
+
+\section{Monadic Syntax}
+
+For a category of lambda calculus, if an endofunctor $T$ gives
+a monad, or the Kleisli tuple is given directly, we write
+\eq{
+    &a \leftarrow m \\
+    &N
+}
+for $(\lambda a. N)^\ast(m)$ or $\bind(m,\lambda a.N)$.
+Suppose the type of $m$ is $TA$, the type of $N$ is $TB$, then the
+term $\lambda a.N$ must have type $A\to TB$. This is equivalent
+to forcing $a$ to have a type $A$.
+
+For example the proof \eqref{bind-ipc}
+$$
+\bind(ma,\lambda a.\bind(f(a),\lambda b.\bind(mh,\lambda h.g(h(b)))))
+$$
+can be reorganized as
+\eq{
+    & a \leftarrow ma \\
+    & b \leftarrow f(a) \\
+    & h \leftarrow mh \\
+    & g(h(b)).
+}
+
+A construction of Glivenko's theorem can also be given as
+\eq{
+    & lem_{p_1} \leftarrow ({\text some proof}_1: \neg\neg(p_1\vee\neg p_1)) \\
+    & lem_{p_2} \leftarrow ({\text some proof}_2: \neg\neg(p_2\vee\neg p_2)) \\
+    & \cdots \\
+    & \eta({\text some\ result}).
+}
+
+The rule for this monadic syntax can be summarized as
+\begin{itemize}
+    \item each line is a $\leftarrow$ where the term on the
+    right must have type $TA$, and the variable (used in the lambda
+    abstraction) must have type $A$. 
+    \item the last line must have type $TB$ and the result of the 
+    the whole expression is of type $TB$. (Note you may want to use
+    the unit $\eta$ to make it reasonable).
+\end{itemize}
+
+If you understand the functor $T$ as `{\it encapsulating some 
+information},' then the $\bind$ function helps you to {\it retrieve}
+it and the infomation is {\bf bound} to the variable before the 
+$\leftarrow$. The notation (or monad) is much more widely applied.
+You can find some other interesting examples in \autoref{monad-examples} about it. 

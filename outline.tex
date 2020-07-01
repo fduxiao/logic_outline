@@ -1,10 +1,12 @@
 \documentclass[12pt,a4paper]{report}
 
+\usepackage{multicol}
 \usepackage{proof}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage{enumitem}
 \usepackage{stmaryrd}
 \usepackage{hyperref,cleveref}
+\usepackage{tikz-cd}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
@@ -23,6 +25,7 @@
 \newtheorem{remark}{\it Remark}[chapter]
 
 \newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\diagram}[1]{\begin{tikzcd}#1\end{tikzcd}}
 
 \newcommand{\inv}{^{\raisebox{.2ex}{$\scriptscriptstyle-1$}}}
 \newcommand{\universe}{\mathcal{U}}
@@ -72,9 +75,7 @@
 \input{type.tex}
 \input{homotopy.tex}
 \input{ipc.tex}
-
-\chapter{Monad}
-\label{monad}
+\input{monad.tex}
 
 \chapter{Other Useful Examples}
 \label{monad-examples}

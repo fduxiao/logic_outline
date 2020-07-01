@@ -114,11 +114,13 @@ classes and that category consists of points as the objects
 homotopies between homotopies as $3$-morphisms and so on, and the
 equality required in identity rule or associativity may be replaced by 
 homotopy $\simeq$ (higher order morphisms, namely the weakness).
-\newcommand{\sphere}{\mathbb{S}}
-
-The fundamental groupoid helps to classify topological spaces
-geometrically. The homotopy intuitively means deformation retraction.
-For example, let $\sphere^1=\{x\in\complex\mid |x| = 1\}$ with ordinary 
+For example, we define $\bar{p}(t)=p(1-t)$ as the inverse path,
+but the concatenation $\bar{p}\centerdot p$ is not the identity 
+(constant map at $p(1)$). We do not write $\bar{p}\centerdot p=\id$ 
+(using homotopy) but $\bar{p}\centerdot p\simeq \id$. This 
+preserves the whole structure of the topological space, so you can
+have some non-trivial structure.\newcommand{\sphere}{\mathbb{S}}
+Let $\sphere^1=\{x\in\complex\mid |x| = 1\}$ with ordinary 
 topology. Let $p(t) = e^{2\pi\iu t}: I\to \sphere^1$ be a path from
 $1$ to $1$. There's no evidence that $[p]=[c_x]$ (the endpoints are 
 fixed), but in the space ${\sphere^1}^I$ (the endpoints are free), 
