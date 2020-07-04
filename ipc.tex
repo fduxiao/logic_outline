@@ -420,7 +420,7 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
         }
     $$
     $$\unit_\phi(x:\phi, f:\phi\to\zero) \defn f(x):\zero$$
-    $$\text{or }\unit_\phi = \lambda x.\lambda f. f\ x$$
+    $$\text{or }\unit_\phi \defn \lambda x.\lambda f. f\ x$$
 \end{proof}
 
 \newcommand{\bind}{\name{bind}}
@@ -434,7 +434,7 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
         }
     $$
     Or $\bind_{a,b}:((a\to \zero)\to\zero)\to(a\to((b\to \zero)\to \zero))\to (b\to \zero)\to \zero$
-    ($\neg\neg a\to (a\to \neg\neg b)\to \neg\neg b$).
+    (Equivalently, $\neg\neg a\to (a\to \neg\neg b)\to \neg\neg b$).
 \end{lemma}
 \begin{proof}
     $$
@@ -452,7 +452,7 @@ axiom (proof by contradicton) replaced by Law of Excluded Middle.
 
     $$
     \bind_{a,b}(x:(a\to\zero)\to \zero, f: a\to(b\to \zero)\to\zero)
-    \defn \lambda k. x\ (\lambda z. f\ z\ b).
+    \defn \lambda k. x\ (\lambda z. f\ z\ k).
     $$
     Note that $k: b\to \zero$ and $z: a$. Thus $f\ z:(b\to\zero)\to\zero$
     and $(f\ z)\ k$ (or $f(z,k)$) has type $\zero$. Then the term
