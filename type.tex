@@ -62,17 +62,17 @@ defined as computations (some kind of functions). (Note both the
 introduce or eliminate certain sentences. Just think them as buttons on
 a calculator.) Again, the axioms in ZFC (when ZFC is considered as the
 identical but distinct version of the one we use in meta langauge) are 
-also such rules. In summary, the logic language is the object, our
+also such rules. In summary, the logic language is the object, while our
 inference is doing computations just like applying a function to an
-element deriving another. 
+element to derive another. 
 
 This coincidence (the inference rules can be viewed as 
 object operations ) is called {\it Curry-Howard 
 Correspondence}. But instead of set theory, typed lambda calculus
 \cite{Curry-Howard} is chosen for it, mainly because it's more natural 
 in computer programming \cite{coq,SF}, and some syntactic rule of lambda 
-calculus coincides with modus ponens. So you won't have to treat the 
-first order language specially, or you may get Rousell's paradox
+calculus coincides with modus ponens, so you won't have to treat the 
+first order language specially
 (one layer of deduction system and syntax and another layer of semantics). 
 Look at the group above, the semantic proof is very natural in our 
 language, but is not applicable pure syntactically. In the rest of this 
@@ -154,7 +154,7 @@ For the real world, you can introduce numbers and basic arithematics like
 the example $\lambda x. x \cdot 2 + 1$, but for a pure theoretical 
 purpose, you can define the numbers as $c_n=\lambda s.\lambda z. s^n\ z$, 
 where $s^n\ z = s\ (s\ (\cdots\ (s\ z)))$. Those $c_n$ are called {\it
-Church numeral}. Try to prove the term $A_+=\lambda x.\lambda y.\lambda s
+Church numerals}. Try to prove the term $A_+=\lambda x.\lambda y.\lambda s
 .\lambda z.x\ s\ (y\ s\ z)$ satisfies the relation 
 $A_+\ c_n\ c_m=_\beta c_{m+n}$. Consider what are the multiplication and 
 exponent. The last example is only available in untyped lambda calculus,
@@ -162,7 +162,7 @@ the fixed point combinator. Compared with the traditional
 \newcommand{\Ycomb}{\mathbf{Y}}
 $$\Ycomb = \lambda f.(\lambda x.f\ (x\ x))\ \lambda x.f\ (x\ x)$$
 such that for any $\lambda$-term $F$, 
-$F\ (\Ycomb)=_\beta \Ycomb\ F$, the exercise in chapter 1 of 
+$F\ (\Ycomb\ F)=_\beta \Ycomb\ F$, the exercise in chapter 1 of 
 \cite{Curry-Howard} is more interesting. Let
 $$
 \begin{array}{lll}
@@ -278,9 +278,9 @@ $$
     \pi_2((M_1, M2)) \to_\beta M_2 \\
     \\
     \text{\bf case}(\left<1, N\right>;x.K;y.L)\to_\beta K[x:=N] \\ 
-    \text{\bf case}(\left<2, N\right>;x.K;y.L)\to_\beta L[y:=N]
+    \text{\bf case}(\left<2, N\right>;x.K;y.L)\to_\beta L[y:=N].
 \end{array}
-$$.
+$$
 
 Of course, you may want to extend the $\lambda$-term to have such
 syntactic definitions, but actually they can be expressed by lambda
@@ -297,11 +297,11 @@ transformation}, which is another interesting theoretical thing.)
     understand them like tuples in set theory. Instead, a better
     understanding is that you actually defined such constructors 
     $(,)_{\sigma\times\tau}: \sigma\to\tau\to\sigma\times\tau$ (the comma
-    in the tuple) and $inj^1_{\sigma\times\tau}: \sigma\to\sigma+\tau$, 
-    $inj^2_{\sigma\times\tau}: \tau\to\sigma+\tau$ like you are allowed
+    in the tuple) and $\name{inj}^1_{\sigma+\tau}: \sigma\to\sigma+\tau$, 
+    $\name{inj}^2_{\sigma+\tau}: \tau\to\sigma+\tau$ like you are allowed
     to write the lambda abstraction. Similarly, the application $(M\ N)$
     never requires that $M$ should be an abstraction, you just think it 
-    as an `applicable' term (e.g, with type $\sigma\to\tau$). You don't 
+    as an `applicative' term (e.g, with type $\sigma\to\tau$). You don't 
     know whether it has the form $(\lambda x.\cdots)$. It's purely a
     syntactic symbol. The type $\sigma\times\tau$ is also a symbol. We
     do not assume any structure like $(M, N)\in M\times N$. To make
@@ -313,16 +313,13 @@ transformation}, which is another interesting theoretical thing.)
     rule} later with a more general description. That is to define
     such a rule, we only need to define them on all constructors.
     When a destructor is applied to a constructor, we define what is a
-    reduction; outherwise, they are pure symbols (like $(M\ N)$).
+    reduction; otherwise, they are pure symbols (like $(M\ N)$).
     (You may want to think of them as axioms. The powerset axiom allows 
     you to define a set from another and others define how to use it.)
 \end{caveat}
 
 The above is the counterpart of propositional logic, which we often
-refer to as {\it simply typed $\lambda$-calculus}. When defining
-$\lambda$-terms which represents some kind of computation or logic,
-we do not define the computation process or correctness directly, but 
-its structure or the evidence that it is sound. 
+refer to as {\it simply typed $\lambda$-calculus}. 
 
 \section{The Usage of Meta Language}
 Though we have two things, $\lambda$-terms and types, as in set theory,
@@ -332,16 +329,16 @@ type universe. However the relation `$:$', unlike `$\in$', is not a
 propositional relation. This relation is judged in our meta-language. 
 (Think about the rules above. The `$:$' relation is not derived from a 
 rule, but a syntactic constraint.) According to the Curry-Howard 
-Correspondence, when a proposition $A$ is provable if and only if a term 
+Correspondence, a proposition $A$ is provable if and only if a term 
 $a$ of this type is constructable ($A$ is inhabited by $a$). Thus the 
-relation $a:A$ is precisely the relation $\proves$ in our meta language. 
+relation $a:A$ is precisely the relation $\proves A$ in our meta language. 
 
 Another thing is the equality. In first order logic, we have a distinct
 symbol `$\doteq$' for the language, but it is interpreted as the identity
 in the model, i.e. the meta-language. In type theory, they are called
 propositional equality and judgemental equality. We may prove `$=$' as
-a proposition (we can find a term of this type), while the $\alpha$-
-conversion (renaming of a $\lambda$-term) shows another equality, i.e.
+a proposition (we can find a term of this type), while the 
+$\alpha$-conversion (renaming of a $\lambda$-term) shows another equality,
 the judgemental equality, an equality prior to the existence of type
 theory. This judgement or definitional equality is denoted by `$\equiv$',
 or sometimes to emphasize it's a definition, I will use `$\defn$'. In 
@@ -350,16 +347,17 @@ propositional equality as a type, and `$\equiv$' is the normal equality
 we use for mathematics (judgemental equality). In other chapters, I will 
 still use `$=$'. 
 
-Now the only things we have to handle is the relation `$:$' and the 
+Now the only things we have to handle are the relation `$:$' and the 
 judgemental equality $\equiv$, and to define the {\it function type} 
 `$\to$', we first define the syntax for the type set, i.e., if $A$ and 
-$B$ are type, then so is $A\to B$. This is called the {\bf formation 
+$B$ are types, then so is $A\to B$. This is called the {\bf formation 
 rule} for $\to$. Then we have to show when this type is {\it inhabited}, 
-i.e. to define an element $f$ of this type $f:A\to B$, I have to use 
+i.e., to define an element $f$ of this type $f:A\to B$, I have to use 
 $\lambda$-abstraction. This extends the syntax of $\lambda$-term. 
 Such a syntax is called the {\bf constructor} of a new type 
 (Another example is the comma $(,): A\to B\to A\times B$. Though I write 
 it as a function, it is not defined as a function, but a new syntax. 
+After introducing the universe, you can express it as a function. 
 The formation rule is like you can always form a new formula but you
 have to first give how to prove such a new formula by constructors and
 only use constructors to `prove' this formula. The abstraction can never 
@@ -428,16 +426,17 @@ types to $f$ and $g$ as hints). Actually there are two type systems, the
 one I introduced is called {\it typing \`a la Curry}, which is a process
 giving types to $\lambda$-terms. In contrast, there's another {\it typing
 \`a la Church} which forces every variable to be assigned with a type.
-Thue Curry typing is helpful when you want to write less type notations 
+The Curry typing is helpful when you want to write less type notations 
 while the Church typing is how we write a proposition. There are some
 further similarity and difference between these two type systems. For
 more details, see Chapter 3 of \cite{Curry-Howard}. Actually I was
 cheating because the Curry-Howard Correspondence should have been stated
-with typing \`a la Church, but as you see, we don't have to be that strict
-with ourselves. Generally I will write the type explicitly, but if it can
-be inferred from the context, why not just omit them? The quantifiers also
-gives us a way to get rid of `free variables', and we don't need to be that
-strict. I will perhaps use subscriptions to indicate the bounded variables.
+with typing \`a la Church, but as you've seen, we don't have to be that 
+strict with ourselves. Generally I will write the type explicitly, but if 
+it can be inferred from the context, why not just omit them? The 
+quantifiers also gives us a way to get rid of `free variables', and we 
+don't need to be that strict. I will perhaps use subscriptions to 
+indicate the bounded variables.
 (For example, $f_{ABC}: (A\to B\to C)\to(A\to B)\to(A\to C)$).
 
 In type theory, the `universal quantifiers' are represented by {\it
@@ -551,23 +550,26 @@ with computation rules
     \rec_\nat(C, c_0,c_s,0) &\defn c_0 \\
     \rec_\nat(C, c_0,c_s,succ(n)) &\defn c_s(n, rec_\nat(C,c_0,c_s,n))
 }
-For example we can define the sum of two natural numberes;
+
+\newcommand{\add}{\name{add}}
+For example we can define the sum of two natural numbers;
 $$
-    \name{add}: \nat\to\nat\to\nat
+    \add: \nat\to\nat\to\nat
 $$
 $$
-    \name{add} \defn \rec_\nat(\nat\to\nat,\id_\nat,\lambda n.\lambda g.\lambda m.\succn(g(m)))
+    \add \defn \rec_\nat(\nat\to\nat,\id_\nat,\lambda n.\lambda g.\lambda m.\succn(g(m)))
 $$
-This is, $\name{add}$ is a function from $\nat$ to $\nat\to\nat$ (when 
+
+This is, $\add$ is a function from $\nat$ to $\nat\to\nat$ (when 
 $C$ is $\nat\to\nat$). To define such a function, we first define 
-$\name{add}\ 0$, which is apparently the identity function 
-($0+n \defn n$), and if $\name{add}\ n$ is defined, we define 
-$\name{add}\ (\succn\ n)$ to be the function which takes a number, applies
-the previous $\name{add}\ n$ and takes the successor of the result, i.e.
-a function $c_s(n:\nat, g:\nat\to\nat) \defn (\lambda m.\succn(g(m)): \nat\to\nat)$
-($\name{add}(\succn(n))\defn \lambda m. \succn(add(n, m))$, i.e. 
-$\name{add}(\succn(n), m)\defn \succn(add(n, m))$). (It's convenient
-to write $\name{add}(n, m)$ as $n+m$)
+$\add\ 0$, which is apparently the identity function 
+($0+n \defn n$), and if $\add\ n$ is defined, we define 
+$\add\ (\succn\ n)$ to be the function which takes a number, applies
+the previous $\add\ n$ and takes the successor of the result, i.e.,
+a function $c_s(n:\nat, g:\nat\to\nat) \defn (\lambda m.\succn(g(m)): 
+\nat\to\nat)$, or $\add(\succn(n))\defn \lambda m. \succn(\add(n, m))$, 
+i.e., $\add(\succn(n), m)\defn\succn(\add(n, m))$. (It's convenient
+to write $\add(n, m)$ as $n+m$)
 
 Similarly we have 
 $$
@@ -588,7 +590,7 @@ where $\pred(0)\defn0$ and $\pred(\succn(n))\defn (\lambda n.\lambda m. n)\ n\de
 
 In the previous examples, you may notice that it suffices to define the
 so called `computation rule' on each constructor. Actually there's a
-{\it pattern matching} manner to define a recursive function, e.g. the
+{\it pattern matching} manner to define a recursive function, e.g., the
 $\pred$ can be defined as
 \eq {
     \pred(0) &\defn 0 \\
@@ -611,12 +613,12 @@ can be derived is inconsistent. Later I will construct a type $\zero$
 without constructors. When $C$ is $\zero$, $\name{loop\_false}(0):\zero$ 
 means absurdity (because no constructor is provided). So far we haven't
 defined any `partial functions'. A turing machine may never {\it halt}
-and $\name{loop\_false}$ is such a case. (This could be understood as a
-computational version of Godel's incompleteness theory.)
+and $\name{loop\_false}$ is such a case. (This could be further developed
+into a computational version of Godel's incompleteness theory.)
 
 Let's generalize this rule $\rec$ a bit. Suppose now I'm going to define
 a dependent function on $\nat$ or predicate something about natural numbers,
-i.e. you have the type $C: \nat\to\universe$. This is easily understand as
+i.e. you have the type $C: \nat\to\universe$. This is easily understood as
 a predicate and to prove something about natural numbers, we can use inductions:
 $$
     \infer{\Pi_{n:\nat}C(n)}{C(0) & \Pi_{n:\nat}(C(n)\to C(\succn(n)))}
@@ -682,7 +684,9 @@ $$
 $$
 This example also shows the difference between `judgemental equality' 
 and `propositional equality'. The symbol $n+0$ will never equal $n$
-judgementally, but they can be proved equal. 
+judgementally, but they can be proved equal. This shows that the equality
+is not only obtained by reflexivity, which further raises the homotopy
+interpretation in \autoref{homotopy}.
 
 \section{Some Simple Types}
 Now that we have seen how a complicated type is defined (actually we
@@ -728,7 +732,7 @@ extend the typed lambda calculus), let me introduce some simpler types.
     $$
 
     \item Given $A, B:U$, we form the {\it coproduct type} $A+B$ with
-    constructors $\inl:A\to A+B$ $\inr:B\to A+B$ (`left injection' and
+    constructors $\inl:A\to A+B$, $\inr:B\to A+B$ (`left injection' and
     `right injection'). The induction principle is
     $$
         \ind_{A+B}: \prod_{C:(A+B)\to\universe}
@@ -754,8 +758,8 @@ extend the typed lambda calculus), let me introduce some simpler types.
     logic and I can give the counterpart of negation in Curry-Howard 
     Correspondence that $\neg\ P$ is understood as a function $P\to\zero$.
     To prove something is wrong, you prove that if this fact is true, 
-    then you can prove absurdity and thus everything. The recursor 
-    $\rec_\zero$ is the principle {\it ex falso quodlibet}.
+    then you can derive absurdity and thus everything. The recursor 
+    $\rec_\zero$ is the principle {\it ex falso (sequitur) quodlibet}.
 
     \item The {\it boolean} type $\two:\universe$ is a type with exactly
     two constructors $0_\two,1_\two:\two$. The induction principle is 
@@ -801,7 +805,7 @@ between some $a: A$ and $p: B(x)$. Trivially, let me just compose them
 together with a tuple $(a, p)$. We call such a behavior {\it dependent 
 pair} or $\Sigma$-type written as $(a,p):\Sigma_{x:A}B(x)$ because this 
 looks like a product type while the type of the second element in the
-tuple {\it dependent} on the first element. Of course, the constructor
+tuple {\it depends} on the first element. Of course, the constructor
 is $(,)_{A,B:A\to\universe}: \Pi_{x:A}B(x)\to\Sigma_{y:A}B(y)$.
 When $B$ is constant, $\Sigma_{x:A}B\defn(A\times B)$. Similarly we can
 define $\pi_1:\Sigma_{x:A}B(x)\to A$ and 
@@ -877,7 +881,7 @@ into a category:
 Such a category is a so-called CCC
 ({\it {\bf C}atesian {\bf C}losed {\bf C}ategory}, a category
 with all finite products and exponentials).
-The products and exponentials are obvious. Tranditionally we would
+The products and exponentials are obvious. Tranditionally, we would
 like to extend the syntax of types with two more constants $\top$($\one$)
 and $\bot$($\zero$). Thus we have terminals and initials in this category. 
 

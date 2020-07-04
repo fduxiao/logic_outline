@@ -123,8 +123,8 @@ be efficiently represented by data structures (objects like sets)\footnote{
 }, we can use the computational feature at current session to generate
 code and then run the result. In logic, you may want to define a function
 to generate proof, which means we don't prove inside the deduction system
-but prove the existence of the construction of a proof in the deduction
-system. As a substitution, type theory embraces these benefits. 
+but prove the existence of the construction of a proof outside the 
+deduction system. As a substitution, type theory embraces these benefits. 
 The type theory contains two inherent layers, a layer of object and
 another of reduction. The latter coincides with the inference rule,
 namely the Curry-Howard correspondence \cite{Curry-Howard,
@@ -151,10 +151,9 @@ theory is described in \autoref{intuitionistic-logic}.
 The meta-programming techniques, i.e generating some parts of
 the proof from the other, can also be applied to proving. A quick example
 is quantification elimination, which provides an algorithm to transfer
-each proof of a quantification-free formula to an equivalent one with
-quantifications under certain circumstances. Haskell
-turns its language into a category and uses monad to represent
-complicated computation process 
+each formula to an equivalent and quantification-free one under certain 
+circumstances. Haskell turns its language into a category and uses monad 
+to represent complicated computation process 
 \cite{the-essence-of-functional-programming}. 
 In \autoref{intuitionistic-logic}, I give the description of Glivenko's 
 theorm and prove it in a monadic style. The concept originated 
