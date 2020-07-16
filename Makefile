@@ -1,4 +1,4 @@
-summary.pdf:outline.tex
+summary.pdf:*.tex
 	mkdir -p output
 	xelatex -output-directory=output outline.tex
 	cp *.bib output/

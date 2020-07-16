@@ -2,63 +2,62 @@
 \addcontentsline{toc}{chapter}{Introduction} 
 
 Several years ago, when I was programming, I was fascinated
-by the concept of meta-programming, i.e., generating code with code
-so that I can write less code. Generally, you write some code for
-a real problem. Even if your target is to generate code, you have
-to execute the code to get the result. This sounds nonsense to a 
-mathematician, but this is actually how we handle mathematical 
-logic, i.e., we define our language as mathematical objects 
-(We define the well formed formula or proof as sets) 
-just as we define a group with set theory. When we want to prove
-something, we follow the predefined syntax (e.g. a deduction system)
-constructing a proof to consolidate a belief. We never infer anything
-about this syntax itself once it is defined. This is because if we
-want to infer about the inference itself, we may end up with the 
-Rousell's paradox. However, we study the structure of reasoning
-safely as a mathematical object. Do we still infer about the inference
-so that it might trigger the paradox? The basic observation is that 
-we treat it as a {\bf standalone} object, an identical but distinct 
-object from the meta one we use. This is also adopted by 
-computer scientists, i.e., they can write a program (usually called 
-a compiler) that turns or generates the source code (as objects) 
-written in the same or different language to a program. Typically, 
-the language they use to write the program is called the meta language, 
-while the outcome language is the target language. They are generally 
-independent. One is analysized as objects of the other. 
+by the concept of meta-programming, i.e., generating code with code. 
+Generally, you write some code to address a real world problem. 
+Even if your immediate goal is to generate code, you ultimately have
+to execute the code to get the result you are after. 
+This sounds like nonsense to a mathematician, but this is actually how 
+logicians handle mathematical logic, i.e., they define the languages as 
+mathematical objects, in particular proofs, just as mathematicans define 
+a group with set theory. When mathematicans want to prove something, they 
+follow the predefined syntax of a deduction system constructing a proof. 
+Within the system, one can never infer anything about this syntax itself 
+once it is defined. This is because if we want to infer about the 
+inference itself, we may end up with the Rousell's paradox. However, the 
+logicians study the structure of reasoning safely as a mathematical object. 
+Do they still infer about the inference so that it might trigger the 
+paradox? The basic observation is that they treat it as a 
+{\bf stand-alone} object, an identical but distinct object from the meta 
+one they use. This is also adopted by computer scientists, i.e., they can 
+write a program (usually called a compiler) that turns the source code 
+(as objects) written in the same or different language to a program. 
+Typically, the language they use to write the program is called the meta 
+language, while the outcome language is the target language. They are 
+generally independent. One is analysized as objects of the other. 
 
-But why do I have to emphasize programming language? A shocking fact is 
-that defining inference rule and applying it to another inference is 
-widely and naturally accepted in programming. For example, you may have
-proven that to prove $\phi$ or $\psi$, you only need to prove $\psi$ 
-assuming $\phi$ is wrong. I used this in the proof of 
+But why do I emphasize the theory of programming languages? A shocking 
+fact is that defining inference rule and applying it to another 
+inference is widely and naturally accepted in programming. For example, 
+you may have proven that to prove $\varphi$ or $\psi$, you only need to 
+prove $\psi$ assuming $\varphi$ is wrong. I used this in the proof of 
 {\it The boundary of a union is contained in the union of boundaries} 
 ($\partial(A\cup B)\subseteq \partial A \cup\partial B$). 
 When proving that proposition in {\it Topology Theory}, I can never 
-write a sentence like $\forall A,B\in Props,\phi\vee\psi \leftrightarrow
-\neg\phi\rightarrow\psi$, because the Topology Theory knows nothing
+write a sentence like $\forall A,B\in Props,\varphi\vee\psi \leftrightarrow
+\neg\varphi\rightarrow\psi$, because the Topology Theory knows nothing
 about the concept $Props$. The proof of it is outside the theory,
 i.e., in the second-order language, but in our language, we can
-prove both. When it comes to the programming language, you can also
-prove them in the same context. According to the Curry-Howard 
+prove both. When it comes to programming languages, you can also
+prove them in the same context. 
+
+According to the Curry-Howard 
 Correspondence \cite{Curry-Howard,Curry-Howard-Scheme}, such a
-proposition $(\neg\phi\to\psi)\to\phi\vee\psi$ is understood as a 
-function, which, given sets \footnote{For an intuitive illustration, 
-here I use set, but it later turns out a type.} $\phi$ and $\psi$, 
+proposition $(\neg\varphi\to\psi)\to\varphi\vee\psi$ is understood as a 
+function, which, given sets\footnote{For an intuitive illustration, 
+here I use set, but it later turns out a type.} $\varphi$ and $\psi$, 
 gives you a function mapping any function from 
-$\neg\phi\to\psi$ to the coproduct $\phi\vee\psi$. (This is 
-called a dependent type, showing a kind of quantification. See 
-\autoref{type-theory} for a formal description.) When using it to
+$\neg\varphi\to\psi$ to the coproduct $\varphi\vee\psi$. When using it to
 prove the propsition about boundary($\partial$), you apply this
-function to some $\phi$, $\psi$ and $\neg\phi\to\psi$ to generate
-a $\phi\vee\psi$. Certainly, this is not a set-theoretic function,
-since $\phi$ and $\psi$ traverse the whole universe of sets. Actually,
+function to some $\varphi$, $\psi$ and $\neg\varphi\to\psi$ to generate
+a $\varphi\vee\psi$. Certainly, this is not a set-theoretic function,
+since $\varphi$ and $\psi$ traverse the whole universe of sets. Actually,
 the behavior is like the $\forall$ quantification, which does traverse
 all sets. When applying it to some element, the compiler will determine
-the suitable set $\phi$ and $\psi$, which won't cause you any trouble
+the suitable set $\varphi$ and $\psi$, which won't cause you any trouble
 except that you want to apply it to itself, i.e., one can still lift
 the order of the language or he/she gets the paradox. A clever solution 
 towards this is building a hierarchical universe as von Neumann did 
-\cite{von-Neumann-universe}. Once $\phi$ and $\psi$ are picked, the 
+\cite{von-Neumann-universe}. Once $\varphi$ and $\psi$ are picked, the 
 compiler will infer the order of our language. 
 
 In our real world, this is what mathematicians want, an any order
@@ -70,14 +69,16 @@ but do you really use it alone? As in any textbook, the author always
 takes a group as a set and apply set theory to prove, and properties
 beyond group theory (like morhpisms) are also discussed with set
 theory. For a third order example, logical structures are also proved
-somewhere. Recall that you must have encountered some problem in
+somewhere. 
+
+Recall that you must have encountered some problem in
 group theory or set theory where you want to use a tautology to turn 
 it into a logically equivalent problem but you have to check whether 
-this tautology is correct or not. Some may argue that they can certainly 
-introduce all these tautologies
+this tautology is correct or not. The first-order logicians argue that 
+they can certainly introduce all these tautologies
 into the deduction system (via schemes\footnote{A collection of
 axioms. Scheme is also the name of a programming language}), so you 
-only have to deal with the first order one \footnote{Unlike the behavior 
+only have to deal with the first order one,\footnote{Unlike the behavior 
 discussed above, a C++ compiler only accepts such functions with all 
 quantifications at the beginning like schemes, i.e. the quantifier 
 prenex form and only universal quantifications are accepted, while 
@@ -86,53 +87,45 @@ so that you can put the quantification at the middle of a sentence.
 Idris, another programming language, adopts the hierarchical universe
 with orders of the language. The macro system of C is a totally 
 separation from the target language as a meta language. They coincide
-with our handling in logic.} (the set theory is also flattened with
-group theory as both are first order), but as you see, in your real 
-practice, you'd like to verify it first and then apply it. (This means
-the inference rules should be finite.) Without always 
-explicitly specifying the order of the language, one can ignore this 
-problem to some extent. A clever computer proof-assistant system will 
-help you with it, or one can just use his/her brain to tell the order. 
-Once this order is determined, the rest is a plain set theory problem 
-first-orderly. (Note also that the set theory used during the 
+with our handling in logic.} e.g., the set theory is also flattened with
+group theory as both are first order, but as you see, in your real 
+practice, you'd like to verify it first and then apply it. This means
+the inference rules should be finite. 
+
+Without always explicitly specifying the order of the language, one can 
+ignore this problem to some extent. A clever computer proof-assistant 
+system will help you with it, or one can just use his/her brain to tell 
+the order. Once this order is determined, the rest is a plain set theory 
+problem first-orderly. Note also that the set theory used during the 
 development of first order language is different from the one developed 
 by first order language later in the fact that they are in different
-universe with different orders). Another notable part is that the
+universe with different orders. Another notable part is that the
 properties of a group (functions and equality) coincide with those of 
 set (definable with set theory). Thus we can represent a group with a
-set. From this perspective, group theory is a domain specific language
-\footnote{This concept is also borrowed from progromming language.
+set. From this perspective, group theory is a domain specific 
+language\footnote{This concept is also borrowed from progromming language.
 In real world, a programmer only focus on the domain of his/her task.
 They want to represent a real world problem with turing machine. Idris
 provides a syntax suger to freely define any domain specific gramma.} 
-(DSL) represented by set theory, or you can call set theory the frontend 
-\footnote{The direct interface we write down in our books or on paper. 
-In programming world, Tensorflow or PyTorch use python as their frontend 
-language.} language for group theory, i.e. every set operation (only the 
-equality comparison and binary operation) is mapped to an operation in 
-group. 
+(DSL) represented by set theory, or you can call set theory the 
+frontend\footnote{The direct interface we write down in our books or on 
+paper. In programming world, Tensorflow or PyTorch use python as their 
+frontend language.} language for group theory, i.e. every set operation 
+(only the equality comparison and binary operation) is mapped to an 
+operation in group. 
 
-The first order language together 
-with sets (models) as its semantics is representative but it is not good 
-at self referring (You have to lift the order of the language and treat 
-it separately). In programming, once the computation process (proofs) can 
-be efficiently represented by data structures (objects like sets)\footnote{
-    For example the {\bf lisp} language family based directly on lambda
-    calculus uses a list-like form as its only syntax, thus making it
-    convenient to generate code.
-}, we can use the computational feature at current session to generate
-code and then run the result. In logic, you may want to define a function
-to generate proof, which means we don't prove inside the deduction system
-but prove the existence of the construction of a proof outside the 
-deduction system. As a substitution, type theory embraces these benefits. 
-The type theory contains two inherent layers, a layer of object and
-another of reduction. The latter coincides with the inference rule,
-namely the Curry-Howard correspondence \cite{Curry-Howard,
-intuitionistic-type-theory}. It's very easy to represent a proof as an
-object (function types) and the {\it $\beta$-reduction} is the inference
-rule {\it modus ponens}. In fact, it can also be used as a better language
-for homotopy theory \cite{homotopy-type-theory} or topos theory
-\cite{Introduction-to-higher-order-categorical-logic,categorical-logic-and-type-theory}
+To embrace this benefit, type theory is proposed as a substitution for
+first-order logic and set theory as a foundation of mathematics. 
+The type theory has a significant advantage over first-order 
+logic that you do not have to treat the semantic and syntactic layers
+apart. The type theory consists of terms with a natural reduction rule. 
+The terms can be used to define objects like groups or functions between
+groups. They also represent witnesses to propositions. The reduction rule
+generally means {\it computation}, which also coincides with the inference
+rule {\it modus ponens}, i.e., the theory is viewed as its own deduction 
+system. An immediate application is that the universe of terms can be 
+introduced as a special type with hierarchical structure, which enables
+one to generate proofs. 
 
 The computational explanation for logic also raises other problems.
 In general we can not compare two proofs. One can always write down
@@ -140,23 +133,18 @@ redundant sentences amidst a proof, as is a redundant calculation
 abstraction. To find the shortest form of a calculation is known as
 the normalization problem in typed lambda calculus\cite{Curry-Howard}.
 Again, the Curry Howard correspondence provides us a way to compare two
-proofs. The different possibilities of a proof towards the same proposition
-gives rise to the intensional structure of type theory (if you admit a
-term of some type is a proof). I mainly develop this part in 
-\autoref{type-theory} and \autoref{HoTT}. A simple version of the logic
-(as you may have observed, this kind of logic is certainly not the
-tradtional one, but the intuitionistic logic) isomorphic to the type
-theory is described in \autoref{intuitionistic-logic}.
+proofs. The different possibilities of a proof towards the same 
+proposition gives rise to the intensional structure of type Theory. 
+The type checking process of a compiler is also known as the verification
+of a proof. See \cite{Curry-Howard} for more information. 
 
-The meta-programming techniques, i.e generating some parts of
-the proof from the other, can also be applied to proving. A quick example
-is quantification elimination, which provides an algorithm to transfer
-each formula to an equivalent and quantification-free one under certain 
-circumstances. Haskell turns its language into a category and uses monad 
-to represent complicated computation process 
-\cite{the-essence-of-functional-programming}. 
-In \autoref{intuitionistic-logic}, I give the description of Glivenko's 
-theorm and prove it in a monadic style. The concept originated 
-in category theory (\autoref{monad}) and is used widely in programming 
-\autoref{monad-examples}. Surprisingly, the same style can be applied to 
-a proof in intuitionistic logic.
+In this summary, I focus on this new pattern to develop proofs.
+In \autoref{type-theory} and \autoref{HoTT}, the type theory is
+introduced. A simple version of the logic\footnote{As you may have 
+observed, this kind of logic is certainly not the tradtional one, but the 
+intuitionistic logic} isomorphic to the type theory is described in 
+\autoref{intuitionistic-logic}, where the important Glivenko's theorem 
+is proved. Then I make use of it with some kind of meta-programming
+technique to generate proofs as a monad. That concept is discussed
+in \autoref{monad}, which is also widely used in other aspects
+\autoref{monad-examples}.
