@@ -1,73 +1,31 @@
 \chapter{Type Theory}
 \label{type-theory}
 
-In this chapter, I mainly describe a basic language like set theory.
-The semantics of first-order language is strongly connected to sets.
-Every first-order formula represents a kind of set operation or property.
-For example, we can prove a group of order prime squared is abelian.
-Let me first formalize it in first order logic. The language should
-be $\mathscr{L}=(\ast)$, and the axioms are
-\begin{align*}
-    \Gamma & = \{ & \\
-        & \forall a b c\ a\ast(b\ast c)=(a\ast b)\ast c,\\
-        & \exists e(\forall a\ e\ast a=a\ast e = a)
-            \wedge (\forall a\exists a\inv(a\inv
-                \ast a = a\ast a\inv=e))\\ 
-    \}.
-\end{align*}
-The semantics behind these first order sentences is a set $G$,
-together with an extra operation $\cdot: G\to G$. The first 
-axiom says some property of this operation, while the second
-can be interpreted in two steps. Half of it, $\exists e
-(\forall a\ e\ast a=a\ast e = a)$\footnote{$\Gamma\models
-\exists e(\forall a\ e\ast a=a\ast e = a)$.}, asserts the
-existence of an element $e^G\in G$ such that for any element
-$a\in G$, $e^G\cdot a= a\cdot e^G=a$, and it is also easy to
-show this $e^G$ is unique in $G$. The other half claims every
-element is invertible. The language itself means operations in
-sets, i.e. the logic is split into two parts, the deduction rules and
-the set-theoretical semantics of it\footnote{The HoTT book
-\cite{homotopy-type-theory} gives a detailed description.}. When
-you are proving a proposition (well-formed formula), you follow the
-deduction rules to obtain a correct proof, while from the semantic
-side, each sentence you write gives you a judgement (equality or 
-existence) about the underlying set of the group. Now I want to say
-it has prime squared order $5^2$, thus adding to $\Gamma$ the axiom
-$\exists x_1\exists x_2\cdots\exists x_{25}, x_1\neq x_2\wedge\cdots
-\wedge x_{24}\neq x_{25}\wedge\forall y, y=x_1\vee\cdots\vee y=x_{25}$. 
-Since semantically we know it's true that any such a group(model) is 
-abelian, then there must be a syntactic proof of the sentence 
-$\forall x\forall y\ x\ast y=y\ast x$ (completeness).
+In this chapter, I will describe a formal language like the language of 
+set theory. Recall we develop the set theory with first order language,
+where every axiom represents a kind of set operation or property. Despite
+the syntax of first order language, we tend to use semantic proofs. For
+example, try to prove ``a group of order prime squared is abelian''.
+You will naturally pick the order(size) of the group, which is certainly
+not expressible in the first order group theory. 
 
-I don't konw what exactly the proof is (you may want to try proving it 
-with pure first order logic), but let me show what's the semantic proof. 
-Normally, the proof of the abelianity is that for any group $G$ of order 
-$p^2$, where $p$ is a prime, we can pick the center 
-$Z =  \{g\in G\mid\forall a\in G\ ag=ga\}$ of it. Thus it can only has 
-order $1$ or $p$ or $p^2$. According to the class equation, 
-$|G| = |Z| + \sum_iC_i$, where $C_i$ are conjugation classes. Thus $|Z|$
-can only be $p$ or $p^2$. If $|Z|\neq p^2$, pick an $x\in G\setminus Z$
-The centralizer $Z(x) = \{g\in g\mid gx=xg\}$ must have order $p^2$, i.e.
-$x$ should be in $Z$, which is a contradiction.
-
-In general, we use a semantic proof everywhere. From the perspective of
-first order language, we define how the set (model) structure is formed,
-while in real world, we perform the computation (of sets) directly. If
-you know how the computation is made, you must be able to write down the
-proof (though it may be very difficult, as the example above). Now think
-what are the first order language and its inference rules. In mathematical 
-logic, the langauge itself is defined as object (set), and the rules are
-defined as computations (some kind of functions). (Note both the 
-{\it modus ponens} and axioms represent whether you are allowed to 
-introduce or eliminate certain sentences. Just think them as buttons on
-a calculator.) Again, the axioms in ZFC (when ZFC is considered as the
-identical but distinct version of the one we use in meta langauge) are 
-also such rules. In summary, the logic language is the object, while our
-inference is doing computations just like applying a function to an
-element to derive another. 
+From the perspective of first order language, we define how the set 
+(model) structure is formed, while in real world, we perform the 
+computation (of sets) directly. If you know how the computation is made, 
+you must be able to write down the proof (though it may be very difficult, 
+as the example above). Now think what is the first order language and 
+its inference rules. In mathematical logic, the language itself is 
+defined as an object (a set), and the rules are defined as computations 
+(functions). (Note both the {\it modus ponens} and axioms 
+represent whether you are allowed to introduce or eliminate certain 
+sentences. Just think them as buttons on a calculator.) Again, the axioms 
+in ZFC \footnote{when ZFC is considered as the identical but distinct 
+version of the one we use in meta language} are also such rules. In 
+summary, the logic language is the object, while our inference is doing 
+computations just like applying a function to an element to derive another. 
 
 This coincidence (the inference rules can be viewed as 
-object operations ) is called {\it Curry-Howard 
+object operations) is called {\it Curry-Howard 
 Correspondence}. But instead of set theory, typed lambda calculus
 \cite{Curry-Howard} is chosen for it, mainly because it's more natural 
 in computer programming \cite{coq,SF}, and some syntactic rule of lambda 
@@ -83,17 +41,20 @@ no extra relation between the first order layer and the semantic layer
 is needed. 
 
 \section{Lambda-Calculus}
-The core of our language is the lambda calculus. I first start with a
-untyped version of them, and then give a simply-typed version. You don't
+The core of our language is the lambda calculus. I first start with an
+untyped version, and then give a simply-typed version. You don't
 have to think about its real meaning. Just play with it until you are
 happy with this concept. (See chapter 1, 3 of \cite{Curry-Howard})
 
-Let 
-$V=\{v_0, v_1, \cdots\}$ be a variable set. Our objects, the 
-$\lambda$-$terms$, are defined as follows\footnote{This notation is
+Let $V=\{v_0, v_1, \cdots\}$ be a variable set\footnote{The only
+requirement for this set is that it should be infinite. Though many
+may choose a countably infinite one for convenience, it is more common
+for computer programs to use a `free monoid generated by finitely many
+characters', i.e. strings like $a,ab,abc,xyz$}.  We defines
+{\it$\lambda$-terms} as follows\footnote{This notation is
 called the backus normal form, or see \autoref{classical-logic}.}. 
 
-\begin{definition}\label{lambda-term}
+\begin{definition}\label{lambda-term}($\lambda$-terms)
     $$\Lambda ::= V \mid (\Lambda\ \Lambda) \mid (\lambda V\ \Lambda)$$
 \end{definition}
 
@@ -106,59 +67,150 @@ You can understand it as:
     is $(\lambda x\ T)$. This is called an abstraction. 
 \end{enumerate}
 
-The abstraction is something like $f(x) = x^2 + 1$. Equivalently, you
-can define it as $f=\lambda x\ (x^2+1)$, though $2,+,1$ are not defined.
-As you may guess, the application is purely substitution.
-
-\begin{definition}\label{beta-reduction}
-    We define a relation $\to_\beta$ between $\lambda$-terms
-    $$((\lambda x\ P) Q) \to_\beta P[x:=Q],$$ where $P[x:=Q]$ means the 
-    substitution of $Q$ for every occurence of $x$ in $P$. 
-\end{definition}
-
-For example $((\lambda x\ (x+x))\ 2)\to_\beta(x+x) = 4$, though
-this is certainly not well defined. I believe you can figure out what
-I mean. This means a step of calculation, called $\beta$-reduction.
-In \cite{homotopy-type-theory}, this is the computation rule for function
-type. The relation $\to_\beta$ is defined for the application of an 
-abstraction and another term. You may want its transitive closure 
-$\twoheadrightarrow_\beta$ (multiple steps of $\beta$-reduction) or 
-reflexive closure $=_\beta$ (they can be both reduced to the same
-$\lambda$-term).
-
-As you may guess again, there's also the annoying problem about free
-variables. Let me first make some conventions for convenience (to
-avoid too many parentheses). 
+Here are some simple examples of $\lambda$-terms.
 \begin{enumerate}
-    \item $(\lambda x\ \lambda\ y\ T)$ is $(\lambda x\ (\lambda y\ T))$.
-    This is called {\it currying}, i.e., a function $f: X\times Y\to Z$ is
-    a function mapping each $x\in X$ to a function $f(x): Y\to Z$ 
-    (Adjunction of the category $Set$)
-    \item In response, $(K\ L\ M)$ is $((K\ L)\ M)$, just like $f(x, y)$
-    is $f(x)(y)$ (Note $f(x): Y\to Z$ is a function). 
-    \item $(\lambda x\ M\ N)$ is $(\lambda x\ (M\ N))$.
-    \item $(M\ \lambda x\ N)$ is $(M\ (\lambda x\ N))$.
+    \item $x$
+    \item $(M\ N)$
+    \item $(\lambda x\  x)$
+    \item $(\lambda x\ (y\ (\lambda z\ (x\ z))))$
 \end{enumerate}
 
-The outermost parentheses are also omitted if that won't cause ambiguity.
-We also write $\lambda x_1 x_2\cdots x_n.M$ for 
-$(\lambda x_1\ (\lambda x_2\ (\cdots(\lambda x_n\ M))))$. Another notable
-observation is that the abstraction is independent of the varible used.
-For example $\lambda x.x$ and $\lambda y.y$ are identical. You can freely
-change the variable used, but be careful about the `naming conflict'. 
-The term $\lambda x. \lambda x. x\ x$ is understood as 
-$\lambda y. \lambda x. x\ x$. (The renaming process is called {\it
-$\alpha$-conversion}. )
+Informally, the abstraction is like the analytic form of a function.
+For example, the function $f(x) = x^2 + 1$ can be expressed with 
+abstraction $f=(\lambda x\ (x^2+1))$. ($2,+,1$ will be introduced later.)
+The application is also analogous to function application, e.g. 
+$(f\ 2)=((\lambda x\ (x^2+1))\ 2)$. As you may guess, we can `compute' 
+this $\lambda$-term with purely substitution: 
+$(f\ 2)=((\lambda x\ (x^2+1))\ 2)\to (2^2+1)$, but before the formal
+definition of this process, we have to handle the problem of
+different choices of the variable $x$ next to $\lambda$ (bounded variable). 
+
+\
+
+We first make the following conventions to save parentheses.
+
+\begin{enumerate}
+    \item $(\lambda x\ \lambda y\ T)$ is $(\lambda x\ (\lambda y\ T))$.
+    \item $(K\ L\ M)$ is $((K\ L)\ M)$. 
+    \item $(\lambda x\ M\ N)$ is $(\lambda x\ (M\ N))$.
+    \item $(M\ \lambda x\ N)$ is $(M\ (\lambda x\ N))$.
+    \item The outermost parentheses are also omitted if that won't cause ambiguity. 
+\end{enumerate}
+
+\begin{remark}
+    A function $f:X\times Y\to Z$ can be viewed as a function
+    sending each $x\in X$ to a function $Y\to Z$, which is the
+    exponential rule in category theory\cite{cat-awodey}. In 
+    $\lambda$-calculus, this style is called {\it currying}.
+    It is then reasonable to consider $(\lambda x\ \lambda y\ T)$
+    as $(\lambda x\ (\lambda y\ T))$. In response, the application
+    is left associative, and we also write 
+    $\lambda x_1\cdots x_n.M$ for 
+    $(\lambda x_1\ (\lambda x_2\ (\cdots(\lambda x_n\ M))))$.
+\end{remark}
+
+
+
+\newcommand{\FV}{{\text{FV}}}
+\begin{definition}
+    (Free Variable) For $M\in\Lambda$, we define a set $\FV(M)\subseteq V$
+    of {\it free variables} recursively.
+    \eq{
+        \FV(x) & = \{x\} \\
+        \FV(\lambda x.P) &= \FV(P)\setminus\{x\} \\
+        \FV(P\ Q) &= \FV(P)\cup \FV(Q)
+    }
+\end{definition}
+
+\begin{example}
+    \
+    \begin{enumerate}
+        \item $\FV(a\ b)=\{a,b\}$
+        \item $\FV(\lambda x.x\ y)=\{y\}$
+    \end{enumerate}
+\end{example}
+
+The function $f(x)=x^2+1$ can also be written as $f(y)=y^2+1$. These two
+representations are considered the same\footnote{Formally speaking, you
+can define the terms as equivalence classes under this equality, but the
+free variables will still be a trouble. Tranditionally, the `renaming'
+of the representative variable is called $\alpha$-conversion and you can
+define a relation $=_\alpha$ for it.}. Sometimes we may encounter a term
+like $(\lambda x\ (x\ (\lambda x\ (x\ x))))$. Since $x$ is not free in the
+inner term $(\lambda x\ (x\ x))$. We can change it to $y$, i.e.,
+$(\lambda y\ (y\ (\lambda x\ (x\ x))))$, and the above equality of 
+$\lambda$-terms says they are the same. Thus the equality means the
+convention that when there's a naming conflict, the inner bounded 
+variable will {\it shadow} the outer one. Now we can define the 
+substitution process.
+
+
+\begin{definition}(substitution of $\lambda$-terms)
+    For $M,N\in\Lambda$ and variable $x$, the substitution of $N$ for
+    $x$ in $M$, written as $M[x:=N]$ is recursively defined as follows.
+    \eq{
+        x[x:=N] & = N \\
+        y[x:=N] & = y & y\neq x\\
+        (P\ Q)[x:=N] & = (P[x:=N]\ Q[x:=N]) \\
+        (\lambda y\ P)[x:=N] &= \lambda y.P[x:=N] & x\neq y,y\notin\FV(N)\\
+    }
+\end{definition}
+
+
+\begin{definition}\label{beta-reduction}($\beta$-reduction)
+    We define a relation $\to_\beta$ between $\lambda$-terms
+    $$(\lambda x.M)\ N \to_\beta M[x:=N],$$ and extend it to be
+    the closure under the rules:
+    $$
+    \begin{array}{lcl}
+        P\to_\beta Q & \Rightarrow & \forall x\in V,\lambda x.P\to_\beta\lambda x.Q \\
+        P\to_\beta Q & \Rightarrow & \forall R\in \Lambda,P\ R\to_\beta Q\ R \\
+        P\to_\beta Q & \Rightarrow & \forall R\in \Lambda,R\ P\to_\beta R\ Q\\
+    \end{array}
+    $$
+\end{definition}
+
+For example, $((\lambda x\ (x+x))\ 2)\to_\beta(2+2) = 4$. 
+A step of $\beta$-reduction is a minimal (atomic) step of
+`computation'. It means how to perform a computation when an abstraction
+is applied to another term. In \cite{homotopy-type-theory}, this is the 
+computation rule for function type. We also define the transitive and 
+reflexive closure $\twoheadrightarrow_\beta$ and the equivalent closure 
+$=_\beta$.
+
+\begin{definition}
+    (multi-step $\beta$-reduction and $\beta$-equality)
+    The multi-step $\beta$-reduction $\twoheadrightarrow_\beta$ is
+    generated under the rules:
+    $$
+    \begin{array}{lcl}
+        P\to_\beta Q & \Rightarrow & P\twoheadrightarrow_\beta Q \\
+        P\twoheadrightarrow_\beta Q, Q\twoheadrightarrow_\beta R & \Rightarrow & P\twoheadrightarrow_\beta R \\
+        P\twoheadrightarrow_\beta P &&
+    \end{array}
+    $$
+    and the relation $=_\beta$ is generated by
+    $$
+    \begin{array}{lcl}
+        P\to_\beta Q & \Rightarrow & P=_\beta Q \\
+        P=_\beta Q, Q=_\beta R & \Rightarrow & P=_\beta R \\
+        P=_\beta P && \\
+        P=_\beta Q &\Rightarrow& Q=_\beta P
+    \end{array}
+    $$
+\end{definition}
 
 For the real world, you can introduce numbers and basic arithematics like
 the example $\lambda x. x \cdot 2 + 1$, but for a pure theoretical 
-purpose, you can define the numbers as $c_n=\lambda s.\lambda z. s^n\ z$, 
+purpose, you can define the natural numbers as $c_n=\lambda s.\lambda z. s^n\ z$, 
 where $s^n\ z = s\ (s\ (\cdots\ (s\ z)))$. Those $c_n$ are called {\it
-Church numerals}. Try to prove the term $A_+=\lambda x.\lambda y.\lambda s
-.\lambda z.x\ s\ (y\ s\ z)$ satisfies the relation 
-$A_+\ c_n\ c_m=_\beta c_{m+n}$. Consider what are the multiplication and 
-exponent. The last example is only available in untyped lambda calculus,
-the fixed point combinator. Compared with the traditional 
+Church numerals}. Try to prove the term $$A_+=\lambda x.\lambda y.
+\lambda s.\lambda z.x\ s\ (y\ s\ z)$$ satisfies the relation 
+$A_+\ c_n\ c_m=_\beta c_{m+n}$. You may want to consider what are the 
+multiplication and exponent. 
+
+The last example is only available in untyped lambda calculus, the fixed 
+point combinator. Compared with the traditional 
 \newcommand{\Ycomb}{\mathbf{Y}}
 $$\Ycomb = \lambda f.(\lambda x.f\ (x\ x))\ \lambda x.f\ (x\ x)$$
 such that for any $\lambda$-term $F$, 
@@ -175,23 +227,25 @@ Prove that $\$\ F=_\beta F\ (\$\ F)$ for all $F\in\Lambda$.
 Then let's talk about typed lambda calculus. All the terms we defined
 above can be applied to any other term, but for a function 
 $f: \mathbb{N}\to\mathbb{N}$, you won't apply it to $\sqrt 2$ and 
-you won't expect the result is an element of the set $\{cat,dog,duck\}$.
+you won't expect $f(3)$ is an element of the set $\{cat,dog,duck\}$.
 Thus we attach each $\lambda$-term with such an annotation. 
 
-Let $U$ be the set of all {\it type variables}. Define the set 
+Let $U$ be a set of all {\it type variables}. Define the set 
 $\Delta$\footnote{In \cite{Curry-Howard}, the letter for such a set is
 $\Pi$, but this is used for dependent function type ($\Pi$-type) 
-(\autoref{dependent-function}) in HoTT, so I change the notation.} as
+(\autoref{dependent-function}) in HoTT, so I change the notation.} of
+types as
 $$
     \Delta ::= U \mid \Delta \to \Delta
 $$
-Now the $\lambda$-terms occur with a type in $\Delta$. For example,
-$\lambda x. x: a\to a$ for some $a\in U$. Formally speaking, the
-notation `:' is introduced as follows. 
+We want to annotate each $\lambda$-term with a type in $\Delta$. 
+For example, $\lambda x. x: a\to a$ for some $a\in U$. Formally speaking, 
+the notation `:' is introduced as follows. 
 
-A context is such a set $\Gamma = \{x_1: \tau_1, \cdots, x_n:\tau_n\}$ 
-with $x_i\in U$ and $\tau_i\in V$. ($U$, $V$ are variables for 
-$\lambda$-terms and types respectively.) We define the {\it typability}
+\begin{definition} (Typability)
+
+A context is a set $\Gamma = \{x_1: \tau_1, x_2:\tau_2, \cdots\}$ 
+with $x_i\in V$ and $\tau_i\in U$. We define the {\it typability}
 relation $\proves$ on the set of all triples $(\Gamma, x, \tau)$, where 
 $x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
 
@@ -208,6 +262,8 @@ $x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
     \item $$\infer{\Gamma\proves M\ N:\tau}{\Gamma\proves M:\sigma\to\tau & \Gamma\proves N:\sigma}$$
     This means you can eliminate the arrow $\to$ in the type by application.
 \end{enumerate}
+
+\end{definition}
 
 Note we start with the context $\Gamma$, where only variables are annotated
 by types. Our target is to define how the $\lambda$-terms are annotated.
