@@ -238,16 +238,46 @@ types as
 $$
     \Delta ::= U \mid \Delta \to \Delta
 $$
+
+We make some conventions for $\lambda$-terms and types.
+\begin{itemize}
+    \item We use $x,y,z$ for variables in $\lambda$-terms.
+    \item We use $M,N,P,Q$ for arbitrary $\lambda$-terms.
+    \item We use $A,B,C$ for type variables.
+    \item We use $\sigma,\tau$ for arbitrary type.
+    \item Later the $\Pi$-type will be introduced, which acts
+    like quantifications, so we can write it as $a: A$ more
+    naturally.
+\end{itemize}
+
 We want to annotate each $\lambda$-term with a type in $\Delta$. 
-For example, $\lambda x. x: a\to a$ for some $a\in U$. Formally speaking, 
-the notation `:' is introduced as follows. 
+For example, $\lambda x. x: \tau\to \tau$ for some $\tau\in \Delta$. 
+The relation `$:$' is introduced recursively. Informally, the term 
+$\lambda x. x$ can be viewed as given an $x$ of type $\tau$, you can
+obtain a result $x:\tau$. That is a bit like you can obtain $\vdash
+\tau\to\tau$ from $\tau\vdash\tau$ in logic, so we first define a
+similar context. 
+
+\begin{definition} (Context)
+    A context is a set $\Gamma = \{x_1: \tau_1, x_2:\tau_2, \cdots\}$
+    of pairs with $x_i\in V$ and $\tau_i\in \Delta$.
+\end{definition}
+
+Based on a context, we gradually build a type annotation as a tree. 
+The notation $\vdash$ is still used. For example, we have 
+$\Gamma,x:\tau\proves x:\tau$ and if we have $\Gamma,x:\tau\proves 
+M:\sigma$, then $\Gamma\proves \lambda x. M:\tau\to\sigma$. We write
+the latter as 
+$$
+\infer{\Gamma\proves \lambda x. M:\tau\to\sigma}{\Gamma,x:\tau\proves M:\sigma}.
+$$
+The horizontal bar just means `if ... then ...'.
 
 \begin{definition} (Typability)
 
-A context is a set $\Gamma = \{x_1: \tau_1, x_2:\tau_2, \cdots\}$ 
-with $x_i\in V$ and $\tau_i\in U$. We define the {\it typability}
-relation $\proves$ on the set of all triples $(\Gamma, x, \tau)$, where 
-$x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
+For context $\Gamma$, term $M$, type $\tau$, we define the {\it typability}
+relation $\proves$ on the set of all triples $(\Gamma, M, \tau)$, 
+(written as $\Gamma\proves M:\tau$).
 
 \begin{enumerate}
     \item $$\infer{\Gamma, x:\tau\proves x:\tau}{}$$
@@ -255,6 +285,7 @@ $x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
     are allowed to define $\proves$ for triple 
     $(\Gamma\cup\{x:\tau\}, x, \tau)$
     ($\Gamma,x:\tau$ means $\Gamma\cup\{x:\tau\}$).
+    The bar is often omitted.
     \item $$\infer{\Gamma\proves\lambda x.M:\sigma\to\tau}{\Gamma,x:\sigma\proves M:\tau}$$
     This means if you have defined the relation $\Gamma,x:\sigma\proves M:\tau$,
     then you can obtain a new relation $\Gamma\proves\lambda x.M:\sigma\to\tau$.
@@ -265,25 +296,62 @@ $x\in\Lambda$ and $\tau\in\Delta$ (written as $\Gamma\proves x:\tau$).
 
 \end{definition}
 
-Note we start with the context $\Gamma$, where only variables are annotated
-by types. Our target is to define how the $\lambda$-terms are annotated.
-Thus a suitable target is to introduce all $\to$ until $\Gamma$ is empty
-(rule 2). For example
+For example
 \begin{enumerate}
     \item $\proves \lambda x.x: \sigma\to\sigma$
+    $$
+        \infer{
+            \lambda x.x: \sigma\to\sigma
+        }{\infer{\proves x:\sigma\proves x:\sigma}{}}
+    $$
     \item $\proves \lambda x.\lambda y.x: \sigma\to\tau\to\sigma$ \\
     (according to currying, $\sigma\to\tau\to\sigma$ should be 
     $\sigma\to(\tau\to\sigma)$)
+    $$
+        \infer{\proves \lambda x.\lambda y.x: \sigma\to\tau\to\sigma}{
+            \infer{x:\sigma\proves\lambda y.x:\tau\to\sigma}{
+                x:\sigma,y:\tau\proves x:\sigma
+            }
+        }
+    $$
     \item $\proves \lambda f.\lambda g.\lambda a. f\ a\ (g\ a):
     (A\to(B\to C))\to(A\to B)\to(A\to C)$
+
+    Let $\Gamma=\{f:A\to B\to C,g:A\to B,a:A\}$.
+    $$
+        \infer{\proves \lambda f.\lambda g.\lambda a. f\ a\ (g\ a):
+        (A\to(B\to C))\to(A\to B)\to(A\to C)}{
+            \infer{
+                f:A\to B\to C\proves\lambda g.\lambda a. f\ a\ (g\ a):(A\to B)\to A\to C
+            }{
+                \infer{
+                    f:A\to B\to C, g: A\to B\proves\lambda a.f\ a\ (g\ a): A\to C
+                }{
+                    \infer{\Gamma\proves f\ a\ (g\ a): C}{
+                        \infer{\Gamma\proves f\ a: B\to C}{
+                            \Gamma\proves f:A\to B\to C 
+                            &
+                            \Gamma\proves a:A
+                        }
+                        &
+                        \infer{\Gamma\proves g\ a: B}{
+                            \Gamma\proves g:A\to B
+                            &
+                            \Gamma\proves a: A
+                        }
+                    }
+                }
+            }
+        }
+    $$
 \end{enumerate}
 
-Coincidently, the context can be given another interpretation. The 
+Coincidently, the context has an alternative interpretation. The 
 {\it range} of a context $\Gamma$ is defined by
 $|\Gamma|=\{\tau\in\Delta\mid(x:\tau)\in\Gamma\}$. The type set $\Delta$
 can also be understood as the set of all well formed formulas (without
-conjunction or disjunction) in propositional logic. Then you can easily 
-observe the following theorem.
+conjunction or disjunction) in propositional logic. Thus we have the 
+following theorem. 
 \begin{theorem}
     (Curry-Howard Correspondence).
     \begin{enumerate}
