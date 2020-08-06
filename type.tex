@@ -365,17 +365,40 @@ following theorem.
     \end{enumerate}
 \end{theorem}
 
-The previous discussion is mainly for application of functions, 
-i.e. the {\it implicational fragment} of propositional logic.
-Actually we only defined rules for how a `function type' $\sigma\to\tau$
-is constructed by some $\lambda$-term and how to compute it by application.
+This is the original form of Curry-Howard Correspondence, which only
+covers the {\it implicational fragment} of propositional logic. In fact,
+the abstraction and application represent the introduction and elimination
+of the connective $\to$. According to the theorem, to find a proof of a
+formula, you can view that formula as a type and find a term {\it inhabiting}
+that type, which gives another possibility for us to come up with a proof.
 
-We adopt the same style to define types for conjunction and disjunction.
-The type set $\Delta$ is extended to
+To handle other connectives, we have to extend our language (both terms 
+and types) and add more annotating rules. The easier part is the type.
 $$
-\Delta ::= V\mid\Delta\to\Delta\mid\Delta\times\Delta\mid\Delta+\Delta
+\Delta ::= V\mid\Delta\to\Delta\mid\Delta\times\Delta\mid\Delta+\Delta\mid\bot
 $$
-with following annotating rules:
+Intuitively, $\Delta\times\Delta$ means conjunction($\wedge$) and
+$\Delta+\Delta$ means disjunction($\vee$). The notations $\times$ and
+$+$ are more natural as $\lambda$-terms. Just like the implication,
+they are represented by the product types($\times$) and coproduct 
+types($+$). To make them inhabitable, the $\lambda$-terms are extended
+as
+\newcommand{\inj}{\name{inj}}
+$$
+\begin{array}{rcl}
+    \Lambda &::=& V \mid \lambda V.\Lambda \mid \Lambda\ \Lambda \\
+            &\mid& (\Lambda, \Lambda) \mid \pi_1(\Lambda) \mid \pi_2(\Lambda)\\
+            &\mid& \inj_1(\Lambda) \mid \inj_2(\Lambda) \mid {\bf case}(\Lambda,V.\Lambda,V.\Lambda) \\
+            &\mid& \epsilon(\Lambda)
+\end{array}
+$$
+with annotating rules:
+$$\infer{\Gamma, x:\tau\proves x:\tau}{}$$
+
+$$\infer{\Gamma\proves\lambda x.M:\sigma\to\tau}{\Gamma,x:\sigma\proves M:\tau}$$
+
+$$\infer{\Gamma\proves M\ N:\tau}{\Gamma\proves M:\sigma\to\tau & \Gamma\proves N:\sigma}$$
+
 $$
 \infer{\Gamma\proves (M, N): \sigma\times\tau}{\Gamma\proves M:\sigma, N:\tau}
 \ \ \ 
@@ -383,10 +406,11 @@ $$
 \ \ \ 
 \infer{\Gamma\proves \pi_2(L):\tau}{\Gamma\proves L: \sigma\times\tau}
 $$
+
 $$
-\infer{\Gamma\proves \left<1, M\right>:\sigma + \tau}{\Gamma\proves M:\sigma}
+\infer{\Gamma\proves \inj_1(M):\sigma + \tau}{\Gamma\proves M:\sigma}
 \ \ \ 
-\infer{\Gamma\proves \left<2, N\right>:\sigma + \tau}{\Gamma\proves N:\tau}
+\infer{\Gamma\proves \inj_2(N):\sigma + \tau}{\Gamma\proves N:\tau}
 $$
 $$
 \infer{\Gamma\proves \text{\bf case}(L;x.M;y.N): \rho}{
@@ -395,64 +419,113 @@ $$
     \Gamma, y:\tau\proves N:\rho
 }
 $$
+
+$$
+\infer{\Gamma\proves \epsilon(M): \sigma}{
+    \Gamma\proves M:\bot
+}
+$$
 where 
 $$
 \begin{array}{c}
-    \pi_1((M_1, M2)) \to_\beta M_1 \\
-    \pi_2((M_1, M2)) \to_\beta M_2 \\
+    \pi_1((M_1, M_2)) \to_\beta M_1 \\
+    \pi_2((M_1, M_2)) \to_\beta M_2 \\
     \\
-    \text{\bf case}(\left<1, N\right>;x.K;y.L)\to_\beta K[x:=N] \\ 
-    \text{\bf case}(\left<2, N\right>;x.K;y.L)\to_\beta L[y:=N].
+    \text{\bf case}(\inj_1(N);x.K;y.L)\to_\beta K[x:=N] \\ 
+    \text{\bf case}(\inj_2(N);x.K;y.L)\to_\beta L[y:=N].
 \end{array}
 $$
 
-Of course, you may want to extend the $\lambda$-term to have such
-syntactic definitions, but actually they can be expressed by lambda
-calculus directly \cite{Curry-Howard} (in an inconvenient way). 
-I prefer to define them syntactically instead of using lambda terms.
-(The technique used to define those $\lambda$-terms is called {\it CPS 
-transformation}, which is another interesting theoretical thing.)
+\begin{remark}
+    The type $\bot$ is a {\it nullary} connective, which means
+    {\bf false} or {\bf absurdity}. The negation $\neg\phi$ of a 
+    formula $\phi$ is an alias to $\phi\to\bot$, which means if
+    we have $\phi$ and $\neg\phi$, then we can obtain $\bot$, the
+    absurdity. Further, if we have $\bot$, we can actually obtain
+    any formula. This is known as {\it ex falso (sequitur) quodlibet}
+    (EFQ).
+\end{remark}
+
+For example, the formula $\neg(\phi\vee\psi)\to\neg \phi\wedge\neg\psi$ 
+can be translated into type 
+$((\phi+\psi)\to\bot)\to((\phi\to\bot)\times(\psi\to\bot))$.
+To find some term inhabiting it, first observe that it suffices to
+prove that $f:(\phi+\psi)\to\bot\proves M:(\phi\to\bot)\times(\psi\to\bot)$
+for some a variable $f$ and a term $M$. We have
+$$
+\infer{f:\phi+\psi\to\bot\proves\lambda x.f(\inj_1(x)):\phi\to\bot}{
+    \infer{f:\phi+\psi\to\bot,x:\phi\proves f(\inj_1(x)):\bot}{
+        \infer{f:\phi+\psi\to\bot,x:\phi\proves \inj_1(x):\phi+\psi}{
+            f:\phi+\psi\to\bot,x:\phi\proves x:\phi
+        }
+        \ \ 
+        f:\phi+\psi\to\bot, x:\phi\proves f:\phi+\psi\to\bot
+    }
+}
+$$
+
+Similarly we have $f:\phi+\psi\to\bot\proves\lambda y.f(\inj_2(y)):\psi\to\bot$.
+Thus we can prove the following (with some types omitted).
+$$
+\infer{\proves\lambda f.(\lambda x.f(\inj_1(x)),\lambda y.f(\inj_2(y))):((\phi+\psi)\to\bot)\to((\phi\to\bot)\times(\psi\to\bot))}{
+    \infer{f:\phi+\psi\to\bot\proves(\lambda x.f(\inj_1(x)),\lambda y.f(\inj_2(y))):(\phi\to\bot)\times(\psi\to\bot)}{
+        f\proves\lambda x.f(\inj_1(x)):\phi\to\bot
+        &
+        f\proves\lambda y.f(\inj_2(y)):\phi\to\bot
+    }
+}
+$$
 
 \begin{caveat}
     \label{constructor-destructor}
     The notations $\pi_i$ and $\text{\bf case}$ are defined syntactically
     just like the lambda abstraction and application. They can only be
-    introduced or eliminated according to the rules above. You cannot
-    understand them like tuples in set theory. Instead, a better
-    understanding is that you actually defined such constructors 
+    {\it introduced} or {\it eliminated} according to the rules above. 
+    You cannot understand them like tuples in set theory. Instead, a better
+    understanding is that you actually defined such {\it constructors} 
     $(,)_{\sigma\times\tau}: \sigma\to\tau\to\sigma\times\tau$ (the comma
-    in the tuple) and $\name{inj}^1_{\sigma+\tau}: \sigma\to\sigma+\tau$, 
-    $\name{inj}^2_{\sigma+\tau}: \tau\to\sigma+\tau$ like you are allowed
+    in the tuple) and $\name{inj}_1^{\sigma+\tau}: \sigma\to\sigma+\tau$, 
+    $\name{inj}_2^{\sigma+\tau}: \tau\to\sigma+\tau$ like you are allowed
     to write the lambda abstraction. Similarly, the application $(M\ N)$
     never requires that $M$ should be an abstraction, you just think it 
     as an `applicative' term (e.g, with type $\sigma\to\tau$). You don't 
     know whether it has the form $(\lambda x.\cdots)$. It's purely a
     syntactic symbol. The type $\sigma\times\tau$ is also a symbol. We
     do not assume any structure like $(M, N)\in M\times N$. To make
-    use of it, we define the destructor $\pi_1:\sigma\times\tau\to\sigma$
-    and $\pi_2:\sigma\times\tau\to\tau$ and the computation rule. That is
-    when you apply a constructor to a destructor, what should happen.
-    Like the application $(M\ N)$, if $M$ is an abstraction, then we can 
-    perform the $\beta$-reduction. This will be called {\it induction 
-    rule} later with a more general description. That is to define
-    such a rule, we only need to define them on all constructors.
-    When a destructor is applied to a constructor, we define what is a
-    reduction; otherwise, they are pure symbols (like $(M\ N)$).
-    (You may want to think of them as axioms. The powerset axiom allows 
-    you to define a set from another and others define how to use it.)
+    use of it, we define the {\it destructor} $\pi_1:\sigma\times\tau\to\sigma$
+    and $\pi_2:\sigma\times\tau\to\tau$ and the computation rule 
+    ($\to_\beta$), which means a reduction when you apply a destructor 
+    to a constructor. Like the application $(M\ N)$, if $M$ is an 
+    abstraction, then we can perform the $\beta$-reduction. Later the 
+    destructors may be called {\it induction rules}. The name makes 
+    sense later. In fact, they play the role of logical axioms. 
 \end{caveat}
+
+\begin{remark}
+    Here the constructors and destructors act just like functions,
+    but they are different, the former is a meta language definition 
+    and the latter is some term in the target language. However, viewing
+    them as `functions' (since the type is still a function type) has 
+    another benefit, i.e., you don't have to
+    always write a long proof tree. The only rule you need to care about
+    is that when a `function' is applied to another term, the types
+    should match. For example, we can simply write a term
+    $\lambda f.(\lambda x.f(\inj_1(x)),\lambda y.f(\inj_2(y)):
+    (\phi+\psi\to\bot)\to(\phi\to\bot)\times(\psi\to\bot)$. 
+\end{remark}
 
 The above is the counterpart of propositional logic, which we often
 refer to as {\it simply typed $\lambda$-calculus}. 
 
 \section{The Usage of Meta Language}
-Though we have two things, $\lambda$-terms and types, as in set theory,
-we will call them both `type'. A term must be introduced with its type 
+Though we have two objects, $\lambda$-terms and types, as in set theory,
+we will call them both `type'. A term must be introduced with its type
+(of form $a:A$) 
 and the type itself can be considered as the element in a higher order 
 type universe. However the relation `$:$', unlike `$\in$', is not a 
 propositional relation. This relation is judged in our meta-language. 
-(Think about the rules above. The `$:$' relation is not derived from a 
-rule, but a syntactic constraint.) According to the Curry-Howard 
+Think about the rules above. The `$:$' relation is not derived from a 
+rule, but a syntactic constraint. According to the Curry-Howard 
 Correspondence, a proposition $A$ is provable if and only if a term 
 $a$ of this type is constructable ($A$ is inhabited by $a$). Thus the 
 relation $a:A$ is precisely the relation $\proves A$ in our meta language. 
@@ -473,13 +546,13 @@ still use `$=$'.
 
 Now the only things we have to handle are the relation `$:$' and the 
 judgemental equality $\equiv$, and to define the {\it function type} 
-`$\to$', we first define the syntax for the type set, i.e., if $A$ and 
+`$\to$', we first define the syntax for types, i.e., if $A$ and 
 $B$ are types, then so is $A\to B$. This is called the {\bf formation 
 rule} for $\to$. Then we have to show when this type is {\it inhabited}, 
-i.e., to define an element $f$ of this type $f:A\to B$, I have to use 
+e.g., to define an element $f$ of this type $f:A\to B$, I have to use 
 $\lambda$-abstraction. This extends the syntax of $\lambda$-term. 
-Such a syntax is called the {\bf constructor} of a new type 
-(Another example is the comma $(,): A\to B\to A\times B$. Though I write 
+Such a syntax is called the {\bf constructor} of a new type\footnote{ 
+Another example is the comma $(,): A\to B\to A\times B$. Though I write 
 it as a function, it is not defined as a function, but a new syntax. 
 After introducing the universe, you can express it as a function. 
 The formation rule is like you can always form a new formula but you
@@ -487,11 +560,13 @@ have to first give how to prove such a new formula by constructors and
 only use constructors to `prove' this formula. The abstraction can never 
 be described by a simpler term. Actually you can even introduce more 
 syntax like the abstraction, e.g. the $\lambda\mu$-calculus 
-\cite{lambda-mu-calculus}.) We also define the {\bf computation rule}
-($\to_\beta$) $(\lambda x. M)\ N \defn M[x:=M]$ showing the 
-{\bf elimination rule} for the function type. And we define the 
-$\alpha$-conversion to identify two $\lambda$-terms, which is called 
-the {\bf uniqueness rule}.
+\cite{lambda-mu-calculus}.}. To make use of a type, we need the
+{\bf elimination rule}({\bf eliminator} or {\bf destructor}) just
+like function application. We also define the {\bf computation rule}
+($\to_\beta$) (e.g. $(\lambda x. M)\ N \defn M[x:=M]$) when a destructor 
+is applied to a constructor. Optionally, we define the {\bf uniqueness rule}
+dual to the computational rule when a constructor is applied to a
+destructor, e.g. $f\equiv\lambda x. f(x)$.
 
 \section{The Universe of Type}
 \label{type-universe}
@@ -518,7 +593,7 @@ in our development of type theory}.
 One would like to omit the subscription $i$ thus ignoring the 
 inconvenience to some extent. For example, $A:\universe$ should have been 
 some $A:\universe_i$ and $\universe:\universe$ is 
-$\universe_i:\universe_{i+1}$, but be carefule that 
+$\universe_i:\universe_{i+1}$, but be careful that 
 $\lambda(i:\nat). \universe_i$ is not a well defined term (The type 
 $\nat$ will be introduced later, and $U_i$ is also understand as term.
 There's no difference between a type and an element of that type. They
