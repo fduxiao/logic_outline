@@ -10,13 +10,16 @@ in algebraic topology.
 This section is about algebraic topology. All `maps' are assumed to be
 continuous unless mentioned otherwise. 
 
+\newcommand{\sqcdot}{\mathbin{\vcenter{\hbox{\rule{.3ex}{.3ex}}}}}
+\newcommand{\concat}{\sqcdot}
+
 \begin{definition}
     \label{path}
     A {\it path} in space $X$ between two points is a map $p: I\to X$.
     If $p_1,p_2$ are two paths such that $p_1(1)=p_2(0)$, then we
-    define their concatenation $p_1\centerdot p_2: I\to X$
+    define their concatenation $p_1\concat p_2: I\to X$
     $$
-        (p_1\centerdot p_2)(t) = \begin{cases}
+        (p_1\concat p_2)(t) = \begin{cases}
             p_1(2\cdot t) & t\in[0,\frac{1}{2}] \\
             p_2(2\cdot(t-\frac{1}{2})), t\in[\frac{1}{2}, 1]
         \end{cases}
@@ -54,7 +57,7 @@ H(1,t)=p_1(1)=p_2(1)$ and $H(s,0)=p_1(s)$, $H(t,1)=p_2(s)$.
     between $x,y\in X$ is the equivalence classes $[p]$ of all paths
     $p$ between $x$ and $y$.
     The composition of $[p_1]: x\to y$ and $[p_2]:y\to z$ is
-    $[p_2]\circ[p_1]=[p_1\centerdot p_2]$. (Note the different conventions
+    $[p_2]\circ[p_1]=[p_1\concat p_2]$. (Note the different conventions
     of order for `composition in category' and `concatenation of paths'.)
     The identity at $x$ is the constant map $c_x$.
 \end{definition}
@@ -110,7 +113,7 @@ using a strict $=$ relation in category, we define a `weak $\infty$-category'
 with $\simeq$ as the equality. For a topological space, we view the
 points as `$0$-morphisms', with paths as `$1$-morphisms' between them. It
 forms a `weak-category' in the sense that 
-$(p_1\centerdot p_2)\centerdot p_3\simeq p_1\centerdot(p_2\centerdot p_3)$,
+$(p_1\concat p_2)\concat p_3\simeq p_1\concat(p_2\concat p_3)$,
 where the homotopy $\simeq$ is included in the weak category as a 
 `$2$-morphisms' between them. Since each morphism has an inverse, we
 can define the fundamental `weak $\infty$-groupoid' of a space. 
@@ -269,8 +272,6 @@ We can also make this proof shorter with {\it pattern matching}.
     is exactly the computation rule).
 \end{proof}
 
-\newcommand{\sqcdot}{\mathbin{\vcenter{\hbox{\rule{.3ex}{.3ex}}}}}
-\newcommand{\concat}{\sqcdot}
 Similarly we can prove the following concatenation of paths.  
 \begin{lemma}
     For $x,y,z: A$, $(\concat):(x=y)\to(y=z)\to(x=z)$ such that
@@ -337,7 +338,71 @@ paths $\Omega^2(A,a)\times\Omega^2(A,a)\to\Omega^2(A,a)$ is commutative.
 
 \section{Functoriality and Fibration}
 
-Now it's
+Now, it's reasonable to think of a type as a groupoid (category).
+The Leibniz rule (\autoref{leibniz}) shows a kind of functoriality.
+
+\newcommand{\ap}{\name{ap}}
+\begin{lemma}
+    For a function $f: A\to B$ and $p: x=_A y$, then we have
+    $$
+        \ap_f: (x=_A y)\to (f(x) =_B f(y)).
+    $$
+    Furthermore, given $g: B\to C$ and $q: y=_A z$, we have
+    \begin{enumerate}
+        \item $\ap_f(p\concat q)=\ap_f(p)\concat\ap_f(q)$
+        \item $\ap_{\id_A}(p)=p$
+        \item $\ap_f(p\inv)=\ap_f(p)\inv$
+        \item $\ap_g(\ap_f(p))=\ap_{g\circ f}(p)$
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+    (In a category, the name $\ap$ is preferred over {\it Leibniz rule}.)
+    To prove it, we first define a type family $D(x,y,p)\defn f(x)=_Bf(y)$.
+    According to the induction rule. To define a function out of the type
+    $x=_Ay$, it suffices to inhabit the type $\Pi_{x:A}D(x,x,\refl_x)$.
+    Note $D(x,x,\refl_x)=f(x)=_Bf(x)$. We have
+    $$
+        d\defn \lambda x.\refl_{f(x)}:\Pi_{x:A}D(x,x,\refl_x).
+    $$
+    Hence we have proved
+    $$
+        \ap_f(p)\defn \ind_{=_A}(D,d,x,y,p): D(x,y,p).
+    $$
+    By the computation rule, we have 
+    $$
+        \ap_f(\refl_x) \equiv \refl_{f(x)}.
+    $$
+    The rest are similar.
+\end{proof}
+
+Sometimes we just write $f(p)$ for $\ap_f(p)$ for convenience. Thus
+we can draw the commutative diagrams for the above lemma.
+
+$$
+\begin{tikzcd}
+    A \arrow{r}{\id_A} & A \arrow{rr}{f} && B \arrow{rr}{g} && C
+    \\
+    x \arrow[dd, bend right, "p"{name=p1, left}] & 
+    x \arrow[dd, bend right, "\id_A(p)"{name=idp, left}]
+    \arrow[dd, "p"{name=p, right}]
+    \arrow{rd}{p\concat q}
+    \arrow[Rightarrow, from=idp, to=p]
+    & &
+    f(x) \arrow[dd, "f(p)"{left}]
+    \arrow[rd, "f(p\concat q)"{name=fpq,left}]
+    \arrow[rd, bend left, "f(p)\concat f(q)"{name=fpfq,right}]
+    \arrow[Rightarrow, from=fpq, to=fpfq]
+    & & g(f(x)) 
+    \arrow[dd, "g(f(p))"{name=gfp1, left}]
+    \arrow[dd, bend left, "(g\circ f)(p)"{name=gfp2, right}]
+    \arrow[Rightarrow, from=gfp1, to=gfp2]
+    \\
+    & & z & & f(z) \\
+    y & y \arrow{ru}{q} & & f(y) \arrow{ru}{f(q)} & & g(f(y))
+\end{tikzcd}
+$$
+
 
 \section{Homtopies in type theory}
 
