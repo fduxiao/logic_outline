@@ -1033,75 +1033,30 @@ types. I haven't found any material about how to categorize dependent
 types but as you may observe, there's a category of simply typed lambda
 calculus. 
 
-\section{Categroy of Simply Typed Lambda Calculus}
-We use the definitional or judgemental equality $=_\beta$ as an
-equivalence relation on the set of all $\lambda$-terms and make it
-into a category:
+\section{Summary}
+The first section comes from \cite{Curry-Howard}, which begins with a very
+naive version of $\lambda$-calculus theory. 
+In the book \cite{homotopy-type-theory} of homotopy type theory, induction
+rule and recursor are introduced abruptly, which confused me a lot when
+I first learned the theory. The original $\lambda$-calculus theory is
+more natural and simpler. I included that before the formal introduction
+of the homotopy type theory. I hope that could give you a soft landing.
 
-\begin{itemize}[label={}]
-    \item objects: the types
-    \item arrows: If $c: A\to B$ is a $\lambda$-term without {\it free
-    variables} (so-called closed term), then $[c]$ is an arrow from
-    $A\to B$.
-    \item Identities: $1_A$ is $[\lambda x: A.x]$.
-    \item Compositions: If $[b]: A \to B$, $[c]: B\to C$, then
-    $[c]\circ [b] = [\lambda x. c(b(x))]$.
-\end{itemize}
+The lecture notes \cite{Curry-Howard} also discuss other interesting
+theory about proof, such as normalization, i.e. how to find the shortest
+possible proof. Other traditional issuse such as halting problem are also
+addressed in the first several chapters. If the reader wants to know more
+about the theory, the book is worth reading. 
 
-\begin{remark}
-    The equivalence relation defines a rule to `identity' different
-    proofs. For example\footnote{This example comes from \cite{Curry-Howard}}
-    $$
-        \infer{\proves\lambda x:\phi.\lambda y:\phi.x:\phi\to\phi\to\phi}
-        {
-            \infer{x:\phi\proves\lambda y:\phi.x:\phi\to\phi}{
-                x:\phi,y:\phi\proves x:\phi
-            }
-        }
-    $$
-    and
-    $$
-        \infer{\proves\lambda x:\phi.\lambda y:\phi.y:\phi\to\phi\to\phi}
-        {
-            \infer{x:\phi\proves\lambda y:\phi.y:\phi\to\phi}{
-                x:\phi,y:\phi\proves y:\phi
-            }
-        }
-    $$
-    are two different proofs ($\lambda x. \lambda y. x\neq_\beta
-    \lambda x.\lambda y. y$) of
-    $$
-        \infer{\proves\phi\to\phi\to\phi}{
-            \infer{\phi\proves\phi\to\phi}{\phi\proves\phi}.
-        }
-    $$
-\end{remark}
+Our developing of type universe (higher order types) follows 
+\cite{homotopy-type-theory}, but a first order version of dependent type
+was first introduced \cite{Curry-Howard}. Even the quite intuitive (first
+order) dependent functions alone could raise an extremely complicated 
+proof system. That may not be negligible later. 
 
-Such a category is a so-called CCC
-({\it {\bf C}atesian {\bf C}losed {\bf C}ategory}, a category
-with all finite products and exponentials).
-The products and exponentials are obvious. Tranditionally, we would
-like to extend the syntax of types with two more constants $\top$($\one$)
-and $\bot$($\zero$). Thus we have terminals and initials in this category. 
-
-Given a $\lambda$-calculus $\mathcal{L}$ (different variable sets)
-and a CCC $\mathbf{C}$, we define a {\it model} of $\mathcal{L}$ in
-$\mathbf{C}$ as an assigement
-\newcommand{\assign}[1]{\llbracket#1\rrbracket}
-\eq {
-    X\ \text{type} &\mapsto \assign{X}\ \text{object} \\
-    b: A\to B\ \text{term} &\mapsto \assign{b}: \assign{A}\to\assign{B}\ \text{arrow}
-}
-such that
-$$
-\mathcal{L}\proves [a]=_\beta[b]: A\to B\text{ implies }
-\assign{a}=\assign{b}: \assign{A}\to\assign{B}
-$$
-
-In \cite{cat-awodey}, the author mentioned that since topoi are
-CCCs, it's natural to describe them with type theory. Combining
-this with the first-order language, the subobject classifier provides
-a natural interpretatioon of higher-order logic by exponentials of
-the classifier. This part is vaguely described and is picked from the
-book \cite{Introduction-to-higher-order-categorical-logic}. I think 
-later I will dive into that book to fully understand this. 
+For other types, such as product and coproduct, \cite{Curry-Howard} gives
+a computational view point while the book \cite{homotopy-type-theory} introduces 
+them by the more general induction principles. Though they are equivalent
+somehow, The reader are still encouraged to first read \cite{Curry-Howard}
+to have a basic feeling about Curry Howard correspondence instead of dive
+into the book \cite{homotopy-type-theory} directly.

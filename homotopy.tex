@@ -34,6 +34,10 @@ continuous unless mentioned otherwise.
     If $A\subseteq X$ is a subset and $f|_A=g|_A$, we can further require
     that $H(x, t)=f(x)=g(x)$ for $x\in A,t\in I$. Such a homotopy is called
     {\it relative homotopy} (homotopy relative to $A$). 
+
+    It can be shown that (relative) homotopy is an equivalence relation.
+    We also write $f\simeq g$ if there exists a homotopy between $f$ and
+    $g$. 
 \end{definition}
 
 We can use homotopy relative to the endpoints to define an equivalent
@@ -97,35 +101,36 @@ where $V(K, U) = \{f: X\to Y\text{ continuous}\mid f(K)\subseteq U\}$.
 Without surprise, The fundamental groupoid of the space $Y^X$ is the
 track groupoid $\pi Y^X$. 
 
-By this manner, we can definer higher order structures, namely the higher
-order homotopy groupoids $\pi_n$. For example $\pi_0$ is the discrete
-\footnote{A discrete category is a category where all morphims are
-identities.} groupoid of all path components. But we can also define a
-weak $\infty$-groupoid\footnote{I have been trying hard to understand
-this concept, but it turns out that it requires lots of category theory
-including (co)monad, (co)algebra and (co)induction 
-\cite{types-are-weak-groupoids} and I've merely found
-some fragmentary materials about this. I'm not sure whether
-it's a good idea or not that I read the theory technically. Despite
-this geometry confusion, I understand how a proof works in 
-\cite{homotopy-type-theory}.}, where we no longer take the equivalence 
-classes and that category consists of points as the objects 
-($0$-morphisms), paths as $1$-morphisms, homotopies as $2$-morphism, 
-homotopies between homotopies as $3$-morphisms and so on, and the
-equality required in identity rule or associativity may be replaced by 
-homotopy $\simeq$ (higher order morphisms, namely the weakness).
-For example, we define $\bar{p}(t)=p(1-t)$ as the inverse path,
-but the concatenation $\bar{p}\centerdot p$ is not the identity 
-(constant map at $p(1)$). We do not write $\bar{p}\centerdot p=\id$ 
-(using homotopy) but $\bar{p}\centerdot p\simeq \id$. This 
-preserves the whole structure of the topological space, so you can
-have some non-trivial structure.\newcommand{\sphere}{\mathbb{S}}
-Let $\sphere^1=\{x\in\complex\mid |x| = 1\}$ with ordinary 
-topology. Let $p(t) = e^{2\pi\iu t}: I\to \sphere^1$ be a path from
-$1$ to $1$. There's no evidence that $[p]=[c_x]$ (the endpoints are 
-fixed), but in the space ${\sphere^1}^I$ (the endpoints are free), 
-they are equivalent (homotopic). Just like the algebraically topological
-part of weak $\infty$-groupoid, this gives us an {\it intensional}
+By this manner, the space of `special (continuous) maps between two
+spaces' will be meaningful as a subspace. For example, we can talk about
+`all paths on the unit circle with one point fixed' as a topological space
+and calculate its foundamental groupoid. Besides, the higher order structures
+rise naturally as the equivalences between lower morphisms. Instead of
+using a strict $=$ relation in category, we define a `weak $\infty$-category'
+with $\simeq$ as the equality. For a topological space, we view the
+points as `$0$-morphisms', with paths as `$1$-morphisms' between them. It
+forms a `weak-category' in the sense that 
+$(p_1\centerdot p_2)\centerdot p_3\simeq p_1\centerdot(p_2\centerdot p_3)$,
+where the homotopy $\simeq$ is included in the weak category as a 
+`$2$-morphisms' between them. Since each morphism has an inverse, we
+can define the fundamental `weak $\infty$-groupoid' of a space. 
+
+\newcommand{\sphere}{\mathbb{S}}
+\begin{example}
+    Let $\sphere^1=\{x\in\complex\mid |x| = 1\}$ with ordinary 
+    topology. Let $p(t) = e^{2\pi\iu t}: I\to \sphere^1$ be a path from
+    $1$ to $1$. There's no evidence that $[p]=[c_x]$ (the endpoints are 
+    fixed), but in the space ${\sphere^1}^I$ (the endpoints are free), 
+    they are equivalent (homotopic). Hence there's no higher order
+    structure\footnote{This is not that obvious. The technique to prove
+    it is used in \cite{homotopy-type-theory}.} 
+    and by the knowledge of fundamental group, we know the fundamental
+    weak $\infty$-groupoid of $\sphere$.
+\end{example}
+
+Just like the algebraically topological
+part of weak $\infty$-groupoid, not every equality between two lambda
+terms is proved by reflectivity, which gives us an {\it intensional}
 \footnote{In contrast to extensional type theory, another type theory
 ignoring different possibilities of the equality.} interpretation of types.
 
@@ -160,6 +165,11 @@ with computation rule
 $$
     \ind_{=_A}(C,c,x,x,\refl_x)\defn c(x).
 $$
+
+You can think of it as `if you want to prove a predication over
+the equality $p: x=y$, you only have to prove the situation when 
+$y\equiv x$' and $p\equiv \refl$'.
+
 This rule, the {\it path induction}, is traditionally called $J$ and we 
 can derive the {\it leibniz rule} (\autoref{leibniz}) from it. For 
 convenience, we have another equivalent variation of it. (This variation 
@@ -186,11 +196,12 @@ Uniquess of Identity Proofs} (UIP).
     \uip: \forall (A: \universe), (x,y:A), (p,q:x=_A y),p=_{x=_A y}q
 \end{equation}
 (It's quite silly to write a lot of $\Pi$s, especially when $\Pi$ exists
-in the subscription, so I write $\forall$ instead.)
+in the subscript, so I write $\forall$ instead.)
 Note we that cannot define this function by pattern match 
 $\uip(A,x,x,\refl,\refl)\defn\refl$\footnote{In programming language
-Idris, this is acceptable.} because we potentially used an
-equivalent $K$ axiom \cite{pattern-matching-without-K}
+Idris, this is acceptable.} because we cannot apply the recursor (the
+induction rule when $C$ is a constant). In some other theory, an
+so-called $K$ axiom is used for pattern matching \cite{pattern-matching-without-K}
 \begin{equation}
     \label{K-axiom}
     K: \forall (A:\universe), (a:A), (P: a=a\to\universe),
@@ -322,6 +333,13 @@ Just like ``{\it Groups in the category of groups are commutative}''
 \cite{cat-awodey} or higher homotopy groups are commutative, we have
 the Eckmann-Hilton theorem in type theory namely that the concatenation of 
 paths $\Omega^2(A,a)\times\Omega^2(A,a)\to\Omega^2(A,a)$ is commutative.
+
+
+\section{Functoriality and Fibration}
+
+Now it's
+
+\section{Homtopies in type theory}
 
 The behavior of the type theory quite resembles homotopy in algebraic
 topology. Let me give more notations.
