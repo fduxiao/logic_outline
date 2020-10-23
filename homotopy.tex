@@ -383,26 +383,143 @@ $$
 \begin{tikzcd}
     A \arrow{r}{\id_A} & A \arrow{rr}{f} && B \arrow{rr}{g} && C
     \\
-    x \arrow[dd, bend right, "p"{name=p1, left}] & 
-    x \arrow[dd, bend right, "\id_A(p)"{name=idp, left}]
-    \arrow[dd, "p"{name=p, right}]
-    \arrow{rd}{p\concat q}
+    x \arrow[dd, rightsquigarrow, bend right, "p"{name=p1, left}] & 
+    x \arrow[dd, rightsquigarrow, bend right, "\id_A(p)"{name=idp, left}]
+    \arrow[dd, rightsquigarrow, "p"{name=p, right}]
+    \arrow[rd, rightsquigarrow, "p\concat q"]
     \arrow[Rightarrow, from=idp, to=p]
     & &
-    f(x) \arrow[dd, "f(p)"{left}]
-    \arrow[rd, "f(p\concat q)"{name=fpq,left}]
-    \arrow[rd, bend left, "f(p)\concat f(q)"{name=fpfq,right}]
+    f(x) \arrow[dd, rightsquigarrow, "f(p)"{left}]
+    \arrow[rd, rightsquigarrow, "f(p\concat q)"{name=fpq,left}]
+    \arrow[rd, rightsquigarrow, bend left, "f(p)\concat f(q)"{name=fpfq,right}]
     \arrow[Rightarrow, from=fpq, to=fpfq]
     & & g(f(x)) 
-    \arrow[dd, "g(f(p))"{name=gfp1, left}]
-    \arrow[dd, bend left, "(g\circ f)(p)"{name=gfp2, right}]
+    \arrow[dd, rightsquigarrow, "g(f(p))"{name=gfp1, left}]
+    \arrow[dd, rightsquigarrow, bend left, "(g\circ f)(p)"{name=gfp2, right}]
     \arrow[Rightarrow, from=gfp1, to=gfp2]
     \\
     & & z & & f(z) \\
-    y & y \arrow{ru}{q} & & f(y) \arrow{ru}{f(q)} & & g(f(y))
+    y & y \arrow[ru, rightsquigarrow, "q"] & & f(y) \arrow[ru, rightsquigarrow, "f(q)"] & & g(f(y))
 \end{tikzcd}
 $$
 
+It is natural to think about the functoriality of dependent functions.
+This is not as simple as its non-dependent version, because for an
+$f: \Pi_{x:A}B(x)$ and $p: x=_A y$, $f(x): B(x)$ and $f(y):B(y)$ lie in
+different types. This difficulty raises the fibration of a type.
+
+The reader may be familiar with tangent bundle or fibre bundle and may
+have already noticed that formally, such a bundle is a dependent pair.
+For a type family $P: A\to \universe$, we may consider $P(a): \universe$ as the fibre
+over $a: A$. Thus $\Sigma_{a:A}P(a)$ is the bundle gathering all the
+fibres. Besides, the projection $\pi_1: \Sigma_{a:A}P(a)\to A$ acts as
+the bundle projection, which suggests that we should call 
+$\Sigma_{a:A}P(a)$ the {\bf total space} and $A$ the {\bf base space}.
+We also call $P:A\to\universe$ the fibration directly. 
+
+\newcommand{\transport}{\name{transport}}
+Thus to compare two elements in different fibres, we can analogously
+define the {\it transport} between them.
+\begin{lemma}\label{transport}
+    For $P: A\to\universe$ and $p: x=_Ay$, we have $p_\ast: P(x)\to P(y)$.
+    Sometimes if we need to indicate thhe $P$ explicitly, we write
+    it as $\transport^P(p,-):P(x)\to P(y)$
+\end{lemma}
+\begin{proof}
+    As previously, let $D(x,y,p)\defn P(x)\to P(y)$. We only have to prove
+    $D(x,x,\refl_x)\equiv P(x)\to P(x)$ for all $x:A$, which is certainly
+    inhabited by $\id_{P(x)}$.
+\end{proof}
+$$
+\begin{tikzcd}
+    P(x) \arrow[rrr, "p_\ast"] & & & P(y) \\
+    & x \arrow[lu, bend right, dash] \arrow[r,rightsquigarrow,"p"]& 
+    y \arrow[ru, bend left, dash] &
+\end{tikzcd}
+$$
+
+\begin{lemma}
+    Here are some properties of $\transport$.
+    \begin{itemize}
+        \item For $P: A\to\universe$, $p: x=y$, $q: y=z$, $u: P(x)$, we have $q_\ast(p_\ast(u))=(p\concat q)_\ast(u)$.
+        \item For $f: A\to B$, $P:B\to\universe$,$p:x=y$, $u: P(f(x))$, we have $\transport^{P\circ f}(p,u)=\transport^P(\ap_f(p), u)$. 
+        \item For $P,Q: A\to\universe$, $f:\Pi_{x:A}P(x)\to Q(x)$, $p:x=y$, $u: P(x)$, we have $\transport^Q(p,f_x(u))=f_y(\transport^P(p, u))$. 
+    \end{itemize}
+\end{lemma}
+
+\newcommand{\lift}{\name{lift}}
+Now we can handle the dependent version of functoriality. First let's
+discuss the lift of a path in the total space. 
+\begin{lemma}\label{lift}
+    For a fibration $P: A\to U$ and a path $p: x=y$ in the base space,
+    given a starting point $u:P(x)$, we can define a lift
+    $$
+        \lift(u, p): (x,u)=(y, p_\ast(u))
+    $$
+    in the total space $\Sigma_{x:A}P(x)$ such that $\pi_1(\lift(u, p))=p$.
+\end{lemma}
+
+\begin{remark}
+    In $\Sigma_{x:A}P(x)$, we should think $(x, u)$ as the starting
+    point, but since $u: P(x)$, giving $u$ is equivalent to giving the
+    tuple $(x, u)$. $\lift(u, p): (x,u)=(y, p_\ast(u))$ is a path in
+    the total space. According to the functoriality, 
+    $\pi_1: \Sigma_{x:A}P(x)\to A$ can be extended to
+    $\ap_{\pi_1}: (=_{\Sigma_{x:A}P(x)\to A})\to(=_{A})$, so
+    $\pi_1(\lift(u, p))$ is actually $\ap_{\pi_1}(\lift(u, p)):\pi_1(x,u)=\pi_1(y,p_*(u))$.
+\end{remark}
+
+$$
+\begin{tikzcd}
+    \Sigma_{x:A}P(x) \arrow[d,"\pi_1"] & 
+    (x,u)
+        \arrow[rd, mapsto, "\pi_1"] 
+        \arrow[rrr, rightsquigarrow, "\lift(u{,}p)"]
+    & & & 
+    (y, p_\ast(u)) \arrow[ld, mapsto, "\pi_1"] 
+    \\
+    A & & x \arrow[r, rightsquigarrow, "p"] & y &
+\end{tikzcd}
+$$
+
+\begin{proof}
+    By setting $D(x,y,p)\defn(x,u)=(y,p_\ast(u))$
+\end{proof}
+
+Second, note that by setting $f'(x)\defn (x, f(x)): A\to\Sigma_{x:A}P(x)$, we 
+can apply the functoriality for $f: \Pi_{x:A}P(x)$ as in the following 
+diagram, where $f(x)$ means $(x, f(x))$ and $f(p)$ is $\ap_{f'}(p)$. 
+
+$$
+\begin{tikzcd}
+    \Sigma_{x:A}P(x) \arrow[d,"\pi_1"] & 
+    f(x)
+        \arrow[rd, dash, bend left, "P(x)"{left}] 
+        \arrow[rrr, rightsquigarrow, "f(p)"]
+    & & & 
+    f(y) \arrow[ld, dash, bend right, "P(y)"{right}] 
+    \\
+    A & & x \arrow[r, rightsquigarrow, "p"] & y &
+\end{tikzcd}
+$$
+
+In this solution, we abandoned the information about the $p:x=y$, which may
+be important sometimes. Since we also have a $\lift(f(x), p): (x, f(x))=(y,p_\ast(f(y)))$,
+it is very natural for us to think about the equality $(y, f(y))=(y,p_\ast(f(y)))$.
+
+\newcommand{\apd}{\name{apd}}
+\begin{lemma}
+    For $f:\Pi_{a:A}P(x)$, we have
+    $$
+    \apd_f: \prod_{p:x=y}p_\ast(f(x))=_{P(y)}f(y)
+    $$
+\end{lemma}
+\begin{proof}
+    Let $D(x,y,p)\defn p_\ast(f(x))= f(y)$.
+\end{proof}
+
+More generally, for $u: P(x)$ and $v: P(y)$, we call the equality
+$p_\ast(u)=_{P(y)}v$ ``{\it a path from $u$ to $v$ lying over $p$}''\footnote{This comes from \cite{homotopy-type-theory}}.
 
 \section{Homtopies in type theory}
 
@@ -467,16 +584,6 @@ The univalence axiom extends it into an equivalence. It is said that this
 axiom raises many consequences ``{\it naturally, simply and compellingly}''
 \cite{homotopy-type-theory}. 
 
-This homotopical interpretation is what I'm struggling with. I still
-feel it a bit difficult for me to accept the unavailability of $\uip$
-\eqref{uip} and I am trying to understand it as I understand `A implies B
-is defined as not A or B'. Also, I don't feel quite happy with the
-$\infty$-groupoid part, because I have never meet with such a higher
-order category before. It seems that the book of HoTT\cite{homotopy-type-theory} 
-wants to interpret the theory syntactically, because it does not require a 
-profound comprehension about what is groupoid. Rather, it implies that the
-homotopy type theory is a better language for this purpose. 
-
 For example when defining a homotopical circle $\sphere$, we can define 
 it as a base point and a loop (path, i.e. the equality) between the 
 basepoint
@@ -490,6 +597,10 @@ $$
 $$
 This kind of style to define a new type (inductively) is called higher
 inductive type (HIT) (chapter 6 of \cite{homotopy-type-theory}).
+To make a function $\sphere\to A$, we have to find an $a:A$ and
+a $p: a=a$, i.e. $\rec(a, p): \sphere\to A$ such that 
+$\rec(a,p)(\base)\defn a$ and $\rec(a,p)(\nloop)=p$. 
+
 To calculate its fundamental group, we find the universal covering space 
 of it, namely a family $\name{cov}:\sphere\to\universe$. That is to
 find an $A: \universe$ and an equality $A=_\universe A$. Letting $A$
@@ -500,11 +611,8 @@ we know that $\succn: \integer\to\integer$ is clearly what we want.
 
 The space $\sum_{x:\sphere}\name{cov}(x)$ forms a covering space of
 the homotopical sphere $\sphere$. For any path $p:x=_\sphere y$,
-we have a {\it transport} $p_\ast:\name{cov}(x)\to \name{cov}(y)$ and
-we can lift the path to $\sum_{x:\sphere}\name{cov}(x)$ with
-\newcommand{\lift}{\name{lift}}
-$\lift(u,p):(x,u)=(y,p_\ast(u))$, where $u: \name{cov}(x)$ is any
-start point in the covering space. Thus we define the $\name{wind}$
+we have a {\it transport} $p_\ast:\name{cov}(x)\to \name{cov}(y)$.
+Thus we define the $\name{wind}$
 function $\name{wind}: \Omega(\sphere,\base)\to\integer$ such that
 for any $p:\base=\base$, $\name{wind}(p)=p_\ast(0)$, which is the
 inverse of $n\mapsto \nloop^n: \integer\to\Omega(\sphere)$.
@@ -516,6 +624,3 @@ Besides, it seems that this language has some other applications.
 In a talk given by Andr\'e Joyal at MIT \cite{joyal2014categorical}, 
 it is suggested that the theory can be further applied to higher topos 
 theory or higher category theory.
-
-Now I think you've seen why functions and equalities are more
-primitive than a relation ($R:A\times B\to \universe$).
